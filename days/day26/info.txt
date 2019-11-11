@@ -1,0 +1,2 @@
+Normally, execl( ) does not return. A successful invocation ends by jumping to the entry point of the new program, and the just-executed code no longer exists in the process’ address space. On error, however, execl( ) returns -1, and sets errno to indicate the problem. We will look at the possible errno values later in this section.
+

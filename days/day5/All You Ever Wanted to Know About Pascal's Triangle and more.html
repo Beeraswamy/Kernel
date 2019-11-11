@@ -1,0 +1,652 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<title>All You Ever Wanted to Know About Pascal's Triangle and more</title>
+<meta name="description" content="All you ever want to and need to know about Pascal's Triangle.">
+
+
+</head><noframes>
+
+<body><style id="BANNERSTYLE" type="text/css">
+div#tb_container{text-align:center; color:#fff}
+div#tb_container a{color:#fff; font-family:Arial, Helvetica, sans-serif; font-size:11px; text-decoration:none}
+div#tb_container a:hover{color:#292929; text-shadow:none}
+div#tb_container div.tb_menu_bg{width:760px; margin:0 auto 10px; padding:0; text-shadow:1px 1px 1px #515151;
+	background-color: #7F9343;
+  	background-image: -moz-linear-gradient(top, #7F9343, #CAD99B); 
+  	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #7F9343),color-stop(1, #CAD99B));
+  	-moz-border-radius:0 0 10px 10px; -webkit-border-radius:0 0 10px 10px; border-radius:0 0 10px 10px;
+  	-moz-box-shadow:1px 1px 2px #292929; -webkit-box-shadow:1px 1px 2px #292929; box-shadow:1px 1px 2px #292929; overflow:hidden;
+	font-family:Arial, Helvetica, sans-serif;
+}
+div#tb_container div.tb_menu_bg a.floatLeftAd{float:left; margin-left:13px; background:url(adm/common/images/tripodLogoAd.png) no-repeat -94px 0; height:27px; width:86px}
+div#tb_container div.tb_menu_bg a.floatLeftAd:hover{background-position:0 0}
+div#tb_container div.tb_menu_bg .txtContainer{float:left; margin:4px 0 0 10px}
+div#tb_container div.tb_menu_bg .txtContainer strong{margin-left:5px; border-left:1px solid; padding-left:18px; color:#292929; text-shadow:none}
+div#tb_container div.tb_menu_bg a.big{font-size:17px; margin:0 10px;}
+</style>
+
+
+<script type="text/javascript" src="http://hb.lycos.com/hb.js"></script>
+<script type="text/javascript">
+var cm_role = "live";
+var cm_host = "tripod.lycos.com";
+var cm_taxid = "/memberembedded";
+var tripod_member_name = "ptri1";
+var tripod_member_page = "ptri1/index.html";
+var tripod_ratings_hash = "1299042568:f8b8183472bc8f93aa35c3e4c407e979";
+
+var lycos_ad_category = {"dmoz":"sports\/skating","ontarget":"&CAT=sports%20and%20recreation&L2CAT=skating%20and%20skateboarding","find_what":"web AND page AND design"};
+
+var lycos_ad_remote_addr = "183.82.155.163";
+var lycos_ad_www_server = "www.tripod.lycos.com";
+var lycos_ad_track_small = "http://members.tripod.com/adm/img/common/ot_smallframe.gif?rand=680657";
+var lycos_ad_track_served = "http://members.tripod.com/adm/img/common/ot_adserved.gif?rand=680657";
+</script>
+
+<script type="text/javascript" src="http://scripts.lycos.com/catman/init.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript"> 
+var lycos_ad = Array();
+var lycos_search_query = "";
+var lycos_onload_timer;
+
+function lycos_check_size() {
+    var window_width = 0, window_height = 0;
+    if (typeof(window.innerWidth) == 'number' ) {
+        window_width = window.innerWidth;
+        window_height = window.innerHeight;
+    } else if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+        window_width = document.documentElement.clientWidth;
+        window_height = document.documentElement.clientHeight;
+    } else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
+        window_width = document.body.clientWidth;
+        window_height = document.body.clientHeight;
+    } 
+    
+    var lycos_track_img = document.createElement('img');
+    if( top == self ) {
+        return 1;
+    } else {
+        if ((window_width < 300) || (window_height < 300)) {
+            lycos_track_img.src=this.lycos_ad_track_small+"&w="+window_width+"&h="+window_height;
+            return 0;
+        } else {
+            lycos_track_img.src=this.lycos_ad_track_served+"&w="+window_width+"&h="+window_height;
+            return 1;
+        }
+    }
+}
+       
+function lycos_insert_ads() {
+    var lycos_ad_mgr = new AdManager();
+    
+    if (this.lycos_search_query) {
+        lycos_ad_mgr.setForcedParam("keyword", this.lycos_search_query);
+    } else if (this.lycos_ad_category && this.lycos_ad_category.find_what) {
+        lycos_ad_mgr.setForcedParam("keyword", this.lycos_ad_category.find_what);
+    }
+
+    if (this.lycos_ad_category && this.lycos_ad_category.dmoz) {
+        lycos_ad_mgr.setForcedParam("page", this.lycos_ad_category.dmoz);
+    } else {
+        lycos_ad_mgr.setForcedParam("page", "member");
+    }
+
+    var lycos_prod_set = lycos_ad_mgr.chooseProductSet();
+    var slots = ["leaderboard", "leaderboard2"];
+    for (var slot in slots) {
+        if (lycos_ad_mgr.isSlotAvailable(slots[slot])) {
+            lycos_ad[slots[slot]] = lycos_ad_mgr.getSlot(slots[slot]);
+        }
+    }
+
+    lycos_ad_mgr.renderFooter();
+}
+
+function generateHref(atag, template){
+    atag.href=template.replace('_MYURL_', window.location.href.replace('http://', '')).replace('_MYTITLE_', 'Check%20out%20this%20Tripod%20Member%20site!'); 
+}
+
+if (lycos_check_size()) {
+    lycos_insert_ads();
+}
+
+
+jQuery.noConflict();
+jQuery(function(){
+  if ( ! lycos_check_size() ) { jQuery("#tb_container").hide(); jQuery("#FooterAd").hide(); return; }
+
+  var onButton = -44;
+  var onShare = -89;
+  var onSearch = 0;
+  var $build = jQuery("#build");
+  var ss = $build.css("top");
+
+	jQuery("#more_click").unbind().click(function(ev){
+      if (ss == onShare) {
+          $build.animate({"top": onButton + "px"});
+          ss = onButton;
+      }
+      else {
+          $build.animate({"top": onShare + "px"});
+          ss = onShare;
+      }
+	});
+											
+	jQuery("#searchlycos").unbind().click(function(ev){
+      if (ss == onSearch) {
+          $build.animate({"top": onButton + "px"});
+          ss = onButton;
+      }
+      else {
+          $build.animate({"top": onSearch + "px"});
+          ss = onSearch;
+      }
+	});
+	
+  var f = jQuery("#FooterAd").remove();
+  f.children("script").remove();
+  f.appendTo("body");
+
+  jQuery("#BANNERSTYLE").appendTo("head");
+
+});
+</script>
+<div id="tb_container">
+    <div class="tb_menu_bg">
+        <div id="tb_menu">
+        
+   <a href="http://www.tripod.com" title="tripod.com" class="floatLeftAd"></a>
+   
+   <div class="txtContainer">
+   <a href="http://www.tripod.com" title="tripod.com" class="big">Build your own FREE website at Tripod.com</a>
+   <strong style="font-size:14px">Share: </strong>
+
+<a href="http://www.facebook.com" onclick="generateHref(this, 'http://facebook.com/sharer.php?u=_MYURL_&t=_MYTITLE_')" id="facebook">Facebook</a> |
+<a href="http://www.twitter.com" onclick="generateHref(this, 'http://twitter.com/home?status=_MYTITLE_%20-%20_MYURL_')" id="twitter">Twitter</a> |
+<a href="http://www.digg.com" onclick="generateHref(this, 'http://digg.com/submit?phase=2&url=_MYURL_&title=_MYTITLE_')" id="digg">Digg</a> |
+<a href="http://reddit.com" onclick="generateHref(this, 'http://reddit.com/submit?url=_MYURL_&title=_MYTITLE_')" id="reddit">reddit</a>
+</div>
+		</div>
+    </div>
+	
+    
+ 
+    <div id="tb_ad" style="display:block!important"><div id="ad_container" style="display:block!important"><script type="text/javascript">document.write(lycos_ad['leaderboard']);</script></div></div>
+</div>
+<div id="FooterAd" style="text-align:center; display:block!important; width:100%!important"><script type="text/javascript">document.write(lycos_ad['leaderboard2']);</script></div>
+<noscript>
+ <img src="http://members.tripod.com/adm/img/common/ot_noscript.gif?rand=680657" alt="" width="1" height="1" />
+ <!-- BEGIN STANDARD TAG - 728 x 90 - Lycos - Tripod Fallthrough - DO NOT MODIFY -->
+ <iframe frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="728" height="90" src="http://ad.yieldmanager.com/st?ad_type=iframe&ad_size=728x90&section=209094"></iframe>
+ <!-- END TAG -->
+</noscript>
+
+
+
+</body>
+
+</noframes><body link="slateblue" vlink="darkslateblue" alink="green" bgcolor="#ffffff"><center><!-- Begin PayPal Logo --><a href="https://www.paypal.com/row/mrb/pal=FFFDPFF6RPB8G" target="_blank"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/paypal_mrb_banner.gif" alt="Sign up for PayPal and start accepting credit card payments instantly." border="0"></a><!-- End PayPal Logo -->
+
+
+
+<basefont size="3">
+
+<center><table>
+<tbody><tr>
+<td valign="middle" align="left"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/pastri1.gif" border="0"></td>
+<td><h1 align="center"></h1><h1>Pascal's Triangle</h1>
+<h3 align="center">And Its Patterns</h3><hr noshade="noshade" size="5" width="75%"></td>
+<td valign="middle" align="right"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/pastri1.gif" border="0"></td>
+</tr>
+</tbody></table>
+</center>
+<font color="darkgreen" face="Arial, Helvetica">
+<center>Pascal's Triangle was originally developed by the ancient Chinese, but Blaise Pascal was 
+the first person to discover the importance of all of the patterns it contained. On this page, I explain
+how the Triangle is formed, and more importantly, many of its patterns.</center></font>
+<hr noshade="noshade" size="5" width="75%">
+<center><table width="70%" bgcolor="tan" border="2">
+<tbody><tr>
+ <td colspan="3"><center><a href="#made">How to Construct Pascal's Triangle</a></center>
+ </td>
+</tr>
+<tr align="center">
+ <td><a href="#sums">Sums of Rows</a></td>
+ <td><a href="#prime">Prime Numbers</a></td>
+ <td><a href="#hockey">Hockey Stick</a></td>
+</tr>
+<tr align="center">
+ <td><a href="#magic">Magic 11's</a></td>
+ <td><a href="#fib">Fibonacci Sequence</a></td>
+ <td><a href="#tri">Triangular Numbers</a></td>
+</tr>
+<tr align="center">
+ <td><a href="#square">Square Numbers</a></td>
+ <td><a href="#points">Points on a Circle</a></td>
+ <td><a href="#sierpinski">Connection to Sierpinski Fractal</a></td>
+</tr>
+<tr align="center">
+ <td><font color="tan">hi</font></td>
+ <td><a href="#polygonal">Polygonal Numbers</a></td>
+ <td><font color="tan">hi</font></td>
+</tr>
+</tbody></table></center>
+<hr noshade="noshade" size="5" width="75%">
+
+<center><a name="made"><br><font size="6">How Pascal's Triangle is Constructed</font></a></center>
+
+<table border="0">
+<tbody><tr>
+<td>
+At the tip 
+of Pascal's Triangle is the number 1, which makes up the zeroth row. The first row (1 &amp; 1) contains two 
+1's, both formed by adding the two numbers above them to the left and the right, in this case 
+1 and 0 (all numbers outside the Triangle are 0's). 
+Do the same to create the 2nd row: 0+1=<b>1</b>; 1+1=<b>2</b>; 1+0=<b>1</b>. 
+And the third: 0+1=<b>1</b>; 1+2=<b>3</b>; 2+1=<b>3</b>; 1+0=<b>1</b>. In this way, the 
+rows of the triangle go on infinitly. A number in the triangle can also be found by nCr (n Choose r) 
+where n is the number of the row and r is the element in that row. For example, in row 
+3, 1 is the zeroth element, 3 is element number 1, the next three is the 2nd element, and 
+the last 1 is the 3rd element. The formula for nCr is:<br><br>
+<center>
+   n!<br>
+--------<br>
+r!(n-r)!<br><br></center>
+</td>
+<td valign="middle" align="center"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptreal1r.gif" alt="Pascal's Triangle" border="0"></td>
+</tr>
+<tr align="left">
+<td colspan="2">
+! means factorial, or the preceeding number multiplied by all the positive integers 
+that are smaller than the number. 5! = 5 × 4 × 3 × 2 × 1 = 120.
+</td></tr>
+</tbody></table>
+<br><center><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tsbar33d.jpg" width="610" border="0"></center><br><br>
+
+<center><a name="sums"><font size="6">The Sums of the Rows</font></a></center> 
+The sum of the numbers in any row is equal to 2 to the n<i><sup>th</sup></i> power 
+or 2<sup>n</sup>, when n is the number of the row. For example:<br><br>
+<center>
+<table border="0"><tbody><tr><td>
+2<sup>0</sup> = 1<br>
+2<sup>1</sup> = 1+1 = 2<br>
+2<sup>2</sup> = 1+2+1 = 4<br>
+2<sup>3</sup> = 1+3+3+1 = 8<br>
+2<sup>4</sup> = 1+4+6+4+1 = 16
+</td></tr></tbody></table></center>
+
+<br><center><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tsbar33d.jpg" width="610" border="0"></center><br><br>
+
+<center><a name="prime"><font size="6">Prime Numbers</font></a></center> 
+If the 1<sup>st</sup> element in a row is a prime number (remember, the 0th element of every row is 1), all the numbers in that
+row (excluding the 1's) are divisible by it. For example, in row 7 (1 7 21 35 35 21 7 1) 
+7, 21, and 35 are all divisible by 7.
+
+<br><center><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tsbar33d.jpg" width="610" border="0"></center><br><br>
+
+<center><a name="hockey"><font size="6">Hockey Stick Pattern</font></a></center> 
+
+<table border="0">
+<tbody><tr>
+<td>
+If a diagonal of numbers of any length is selected starting at any of the 1's bordering 
+the sides of the triangle and ending on any number inside the triangle on that diagonal, the 
+sum of the numbers inside the selection is equal to the number below the end of the selection 
+that is not on the same diagonal itself. If you don't understand that, look at the drawing.<br>
+<font color="#ff0000">1+6+21+56 = 84</font><br>
+<font color="#00ff00">1+7+28+84+210+462+924 = 1716</font><br>
+<font color="#0000ff">1+12 = 13</font><br>
+</td>
+<td valign="middle" align="center"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptreal1h.gif" border="0"></td>
+</tr>
+</tbody></table>
+
+<br><center><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tsbar33d.jpg" border="0"></center><br><br>
+
+<center><a name="magic"><font size="6">Magic 11's</font></a></center>
+If a row is made into a single number by using each element as a digit of the number 
+(carrying over when an element itself has more than one digit), the number is equal to 
+11 to the n<i><sup>th</sup></i> power or 11<sup>n</sup> when n is the number of the row 
+the multi-digit number was taken from.<br>
+<center><table border="1" cellspacing="0">
+<tbody><tr align="center">
+<td><b>Row #</b></td>
+<td><b>Formula</b></td>
+<td><b>=</b></td>
+<td><b>Multi-Digit number</b></td>
+<td><b>Actual Row</b></td>
+</tr>
+<tr align="center">
+<td>Row 0</td><td>11<sup>0</sup></td><td>=</td><td>1</td><td>1</td>
+</tr>
+<tr align="center">
+<td>Row 1</td><td>11<sup>1</sup></td><td>=</td><td>11</td><td>1  1</td>
+</tr>
+<tr align="center">
+<td>Row 2</td><td>11<sup>2</sup></td><td>=</td><td>121</td><td>1  2  1</td>
+</tr>
+<tr align="center">
+<td>Row 3</td><td>11<sup>3</sup></td><td>=</td><td>1331</td><td>1  3  3  1</td>
+</tr>
+<tr align="center">
+<td>Row 4</td><td>11<sup>4</sup></td><td>=</td><td>14641</td><td>1  4  6  4  1</td>
+</tr>
+<tr align="center">
+<td>Row 5</td><td>11<sup>5</sup></td><td>=</td><td>161051</td><td>1  5  10  10  5  1</td>
+</tr>
+<tr align="center">
+<td>Row 6</td><td>11<sup>6</sup></td><td>=</td><td>1771561</td><td>1  6  15  20  15  6  1</td>
+</tr>
+<tr align="center">
+<td>Row 7</td><td>11<sup>7</sup></td><td>=</td><td>19487171</td><td>1  7  21  35  35  21  7  1</td>
+</tr>
+<tr align="center">
+<td>Row 8</td><td>11<sup>8</sup></td><td>=</td><td>214358881</td><td>1  8  28  56  70  56  28  8  1</td>
+</tr>
+</tbody></table></center>
+
+<br><center><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tsbar33d.jpg" width="610" border="0"></center><br><br>
+
+<center><a name="fib"><font size="6">Fibonnacci's Sequence</font></a></center>
+<table border="0">
+<tbody><tr>
+<td>
+Fibonnacci's Sequence can also be located in Pascal's Triangle. The sum of the numbers 
+in the consecutive rows shown in the diagram are the first numbers of the Fibonnacci 
+Sequence. The Sequence can also be formed in a more direct way, very similar to 
+the method used to form the Triangle, by adding two consecutive numbers in 
+the sequence to produce the next number. The creates the sequence: 1,1,2,3,5,8,13,21,34,
+55,89,144,233, etc . . . . The Fibonnacci Sequence can be found in the Golden Rectangle, 
+the lengths of the segments of a pentagram, and in nature, and it decribes a curve which 
+can be found in string instruments, such as the curve of a grand piano. 
+The formula for the n<i><sup>th</sup></i> number 
+in the Fibonnacci Sequence is <img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/fibform.gif" align="top">
+<br>Try the formula out below (requires JavaScript)<br>
+
+<form name="fibform">
+Enter N: <input size="5" name="txtN">
+<input name="cmdCalculate" value="Calculate" onclick="calc_fib()" type="button">
+Result: <input size="20" name="txtResult">
+</form></td>
+<td valign="middle" align="center"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptreal1f.gif" border="0"></td>
+</tr>
+</tbody></table>
+
+
+<script>
+function calc_fib()
+{
+  var N = document.fibform.txtN.value;
+  if (N > 1470) { document.fibform.txtResult.value = "Error"; }
+  document.fibform.txtResult.value = Math.round((1/Math.sqrt(5)) * (Math.pow((1+Math.sqrt(5))/2,N)-Math.pow((1-Math.sqrt(5))/2,N)));
+}
+</script>
+
+
+
+
+<br><center><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tsbar33d.jpg" width="610" border="0"></center><br><br>
+
+<center><a name="tri"><font size="6">Triangular Numbers</font></a></center>
+<table border="0">
+<tbody><tr>
+<td valign="middle" align="center"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptreal1t.gif" border="0"></td>
+<td align="right">
+Triangular Numbers are just one type of polygonal numbers. See the section on 
+<a href="#polygonal">Polygonal Numbers</a> for an explaination of polygonal and 
+triangular numbers. The triangular numbers can be found in the diagonal starting 
+at row 3 as shown in the diagram. The first triangular number is 1, the second is 3, 
+the third is 6, the fourth is 10, and so on.
+</td>
+</tr>
+</tbody></table>
+
+<br><center><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tsbar33d.jpg" width="610" border="0"></center><br><br>
+
+<center><a name="square"><font size="6">Square Numbers</font></a></center>
+<table border="0">
+<tbody><tr>
+<td valign="middle" align="center"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptreal1q.gif" border="0"></td>
+<td align="right">
+Square Numbers are another type of <a href="#polygonal">Polygonal Numbers</a> 
+They are found in the same diagonal as the triangular numbers. A Square Number 
+is the sum of the two numbers in any circled area in the diagram. (The colors 
+are different only to distinguish between the separate "rubber bands"). The 
+n<sup>th</sup> square number is equal to the n<sup>th</sup> triangular number plus 
+the (n-1)<sup>th</sup> triangular number. (Remember, any number outside the triangle 
+is 0). The interesting thing about these 4-sided polygonal numbers is that their 
+name explains them perfectly. The very first square number is 0<sup>2</sup>. The second 
+is 1<sup>2</sup>, the third is 2<sup>2</sup> (4), the fourth is 3<sup>2</sup> (9), and 
+so on. Read on to the Polygonal Number section to learn more.
+</td>
+</tr>
+</tbody></table>
+
+<br><center><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tsbar33d.jpg" width="610" border="0"></center><br><br>
+
+<center><a name="polygonal"><font size="6">Polygonal Numbers</font></a></center>
+Polygonal Numbers are really just the number of vertexes in a figure formed by 
+a certain polygon. The first number in any group of polygonal numbers is 
+always 1, or a point. The second number is equal to the number of vertexes of 
+the polygon. For example, the second pentagonal number is 5, since pentagons 
+have 5 vertexes (and sides). The third polygonal number is made by extending two of 
+the sides of the polygon from the second polygonal number, completing the larger polygon, 
+and placing vertexes <i>and other points where necessary</i>. The third polygonal number 
+is found by adding all the vertexes <i>and points</i> in the resulting figure. (Look at 
+the table below for a clearer explaination). My colleagues' formula (the Shi-Cheng formula) 
+for the n<sup><i>th</i></sup> x-gonal number (for example: the 2<sup>nd</sup> 3-gonal, 
+or triangular number) is:<br><br>
+If x is even, then:<br>
+y = x/2 - 1 and the formula is n+y(n<sup>2</sup>-n)<brgt;><br>
+If x is odd, then:<br>
+y = (x-1)/2 and the formula is (-(n<sup>2</sup>)+3n+2n<sup>2</sup>y-2ny)/2<br><br>
+These formulas work fine, but I think my own formula (the Winton formula) is much less convoluted, 
+and is based on the fact that to find the n<sup><i>th</i></sup> x-gonal number, you multiply 
+the number in the 3<sup>rd</sup> diagonal in the n<sup><i>th</i></sup> row by x-2, and 
+then add the number in that same row but in the 2<sup>nd</sup> diagonal. Therefore:<br><br>
+((n<sup>2</sup>-n)/2) × (x-2) + n<br><br>
+
+<form name="ngonform">
+<center><hr size="2" width="50%">
+Find the n<sup><i>th</i></sup> x-gonal number using the Winton formula:<br>
+N: <input size="10" name="txtNw"><br>
+X: <input size="10" name="txtXw"><br>
+<input value="Calculate w" name="cmdCalculate" onclick="calcw()" type="button">
+Result: <input size="20" name="txtResultw"><br><br>
+
+
+<hr size="2" width="50%">
+Find the n<sup><i>th</i></sup> x-gonal number using the Shi-Cheng formula:<br>
+N: <input size="10" name="txtNsc"><br>
+X: <input size="10" name="txtXsc"><br>
+<input value="Calculate" name="cmdCalculatesc" onclick="calcs()" type="button">
+Result: <input size="20" name="txtResultsc"><br><br>
+<hr size="2" width="50%"></center>
+</form>
+
+<script>
+function calcw()
+{
+var n = Number(document.ngonform.txtNw.value);
+var x = Number(document.ngonform.txtXw.value);
+
+document.ngonform.txtResultw.value = (n*n - n)/2 * (x-2) + n;
+}
+
+function calcs()
+{
+var x = Number(document.ngonform.txtXsc.value);
+var n = Number(document.ngonform.txtNsc.value);
+var y = Number(0);
+
+if (x/2 == Math.floor(x/2))
+{
+ y = Number(x/2-1);
+ document.ngonform.txtResultsc.value = n + y*(n*n-n)
+}
+
+if (x/2 != Math.floor(x/2))
+{
+ y = Number((x-1)/2);
+ document.ngonform.txtResultsc.value = (-(n*n)+(3*n)+(2*n*n*y)-(2*n*y))/2;
+}
+
+}
+</script>
+
+
+<center><table border="2" cellspacing="0">
+<tbody><tr align="center" bgcolor="#ccffcc">
+ 
+ <td>Type</td><td>1<sup>st</sup></td><td>2<sup>nd</sup></td><td>3<sup>rd</sup></td>
+ <td>4<sup>th</sup></td><td>5<sup>th</sup></td><td>6<sup>th</sup></td><td>7<sup>th</sup></td>
+ 
+
+</tr><tr valign="baseline" align="left" bgcolor="#ffffff">
+ <td valign="middle" align="center">Triangular</td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/polydot.gif" border="0"></td> 
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tri1.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tri2.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tri3.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tri4.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tri5.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tri6.gif" border="0"></td>
+</tr>
+<tr align="center" bgcolor="#ceceff">
+ <td>Value</td><td>1</td><td>3</td><td>6</td><td>10</td><td>15</td><td>21</td><td>28</td>
+</tr>
+<tr valign="baseline" align="left" bgcolor="#ffffff">
+ <td valign="middle" align="center">Square</td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/polydot.gif" border="0"></td> 
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/quad1.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/quad2.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/quad3.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/quad4.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/quad5.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/quad6.gif" border="0"></td>
+</tr>
+<tr align="center" bgcolor="#ceceff">
+ <td>Value</td><td>1</td><td>4</td><td>9</td><td>16</td><td>25</td><td>36</td><td>49</td>
+</tr>
+<tr valign="baseline" align="left" bgcolor="#ffffff">
+ <td valign="middle" align="center">Pentagonal</td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/polydot.gif" border="0"></td> 
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/pent1.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/pent2.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/pent3.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/pent4.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/pent5.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/pent6.gif" border="0"></td>
+</tr>
+<tr align="center" bgcolor="#ceceff">
+ <td>Value</td><td>1</td><td>5</td><td>12</td><td>22</td><td>35</td><td>51</td><td>70</td>
+</tr>
+<tr valign="baseline" align="left" bgcolor="#ffffff">
+ <td valign="middle" align="center">Hexagonal</td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/polydot.gif" border="0"></td> 
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/hex1.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/hex2.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/hex3.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/hex4.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/hex5.gif" border="0"></td>
+ <td><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/hex6.gif" border="0"></td>
+</tr>
+<tr align="center" bgcolor="#ceceff">
+ <td>Value</td><td>1</td><td>6</td><td>15</td><td>28</td><td>45</td><td>66</td><td>91</td>
+</tr>
+</tbody></table></center>
+
+<br><center><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tsbar33d.jpg" width="610" border="0"></center><br><br>
+
+<center><a name="points"><font size="6">Points on a Circle</font></a></center>
+
+<center><table width="90%" border="1">
+<tbody><tr valign="bottom" align="center" bgcolor="#669999">
+<td>Image</td>
+<td>Points</td>
+<td>Segments</td>
+<td>Triangles</td>
+<td>Quadrilaterals</td>
+<td>Pentagons</td>
+<td>Hexagons</td>
+<td>Heptagons</td>
+</tr>
+<tr align="center" bgcolor="#ffffff"><td bgcolor="#ffffff"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptc1.gif"></td><td>1</td></tr>
+<tr align="center" bgcolor="#ffffff"><td bgcolor="#ffffff"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptc2.gif"></td><td>2</td><td>1</td></tr>
+<tr align="center" bgcolor="#ffffff"><td bgcolor="#ffffff"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptc3.gif"></td><td>3</td><td>3</td><td>1</td></tr>
+<tr align="center" bgcolor="#ffffff"><td bgcolor="#ffffff"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptc4.gif"></td><td>4</td><td>6</td><td>4</td><td>1</td></tr>
+<tr align="center" bgcolor="#ffffff"><td bgcolor="#ffffff"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptc5.gif"></td><td>5</td><td>10</td><td>10</td><td>5</td><td>1</td></tr>
+<tr align="center" bgcolor="#ffffff"><td bgcolor="#ffffff"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptc6.gif"></td><td>6</td><td>15</td><td>20</td><td>15</td><td>6</td><td>1</td></tr>
+<tr align="center" bgcolor="#ffffff"><td bgcolor="#ffffff"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/ptc7.gif"></td><td>7</td><td>21</td><td>35</td><td>35</td><td>21</td><td>7</td><td>1</td></tr>
+
+</tbody></table></center>
+As you may have noticed, the numbers in the chart above are actually the tip of the 
+right-angled form of Pascal's Triangle, except the preceeding 1's in each row are missing. 
+The circular figures are formed by simply placing a number of points on a circle and then 
+drawing all the possible lines between them. This chart shows that for a figure with 
+n points, all you need to do is look at the n<i><sup>th</sup></i> row of the Triangle
+in order to find the number of points, line segments, and polygons in 
+the figure with ALL of their vertices on the circle.
+<br><center><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/tsbar33d.jpg" width="610" border="0"></center><br><br>
+
+<center><a name="sierpinski"><font size="6">Connection to Sierpinski's Triangle</font></a></center>
+
+<table border="0">
+<tbody><tr>
+<td>
+When all the odd numbers (numbers not divisible by 2) in Pascal's Triangle 
+are filled in (black) and the rest (the evens) are left blank (white), the recursive
+Sierpinski Triangle fractal is revealed (see figure at near right), showing yet another 
+pattern in Pascal's Triangle. Other interesting patterns are formed if the elements not divisible 
+by other numbers are filled, especially those indivisible by prime numbers. 
+<a href="http://ptri1.tripod.com/ptriprogs.html">Go here</a> to download programs that calculate 
+Pascal's Triangle and then use it to create patterns, such as the detailed, right-angle 
+Sierpinski Triangle at the far right.
+</td>
+<td valign="middle" align="center"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/pascal8.gif" border="0"></td>
+<td valign="middle" align="center"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/sierpin1.gif" border="0"></td>
+</tr>
+</tbody></table>
+<br>
+<hr>
+<center>
+<!-- Comments? Tell me <a href="comments2.html">here</a><br> -->
+
+
+<table border="0">
+<tbody><tr>
+<td>
+
+</td>
+
+
+<td>
+
+
+
+</td>
+
+<td valign="middle">
+</td>
+</tr></tbody></table>
+
+</center>
+
+
+<!-- BEGIN FASTCOUNTER CODE -->
+<a href="http://member.linkexchange.com/cgi-bin/fc/fastcounter-login?513208" target="_top">
+<img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/fastcounter" border="0"></a>
+<!-- END FASTCOUNTER CODE -->
+<br>
+<!-- BEGIN FASTCOUNTER LINK -->
+<font face="arial" size="1">
+<a href="http://www.fastcounter.com/fc-join" target="_top">FastCounter by LinkExchange</a></font><br>
+<!-- END FASTCOUNTER LINK -->
+
+<!-- start of NedStat code -->
+<a href="http://nedstat.tripod.com/bin/viewstat?name=absolutebow-0"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/nedstat.gif" alt="Nedstat Counter" height="3" width="3" border="0"></a>
+<!-- end of NedStat code -->
+
+
+<center><!-- Begin PayPal Logo --><a href="https://www.paypal.com/row/mrb/pal=FFFDPFF6RPB8G" target="_blank"><img src="All%20You%20Ever%20Wanted%20to%20Know%20About%20Pascal%27s%20Triangle%20and%20more_files/paypal_mrb_banner.gif" alt="Sign up for PayPal and start accepting credit card payments instantly." border="0"></a><!-- End PayPal Logo --></center></brgt;></center></body></html>

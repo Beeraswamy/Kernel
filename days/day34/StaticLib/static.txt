@@ -1,0 +1,18 @@
+http://www.mkssoftware.com/docs/man1/ar.1.asp
+# Compile: cc -Wall -c ctest1.c ctest2.c
+Compiler options:
+
+    * -Wall: include warnings. See man page for warnings specified.
+
+# Create library "libctest.a": ar -cvq libctest.a ctest1.o ctest2.o
+# List files in library: ar -t libctest.a
+# Linking with the library:
+c - suppress the messages
+v - display additional information such as files getting added
+q - append the specified file to the archive .ar does not check if the file is already a member in archive
+    * cc -o executable-name prog.c libctest.a
+    * cc -o executable-name prog.c -L/path/to/library-directory -lctest
+
+Historical note: After creating the library it was once necessary to run the command: ranlib ctest.a. This created a symbol table within the archive. Ranlib is now embedded into the "ar" command. 
+
+

@@ -1,0 +1,12 @@
+# 1 "macro1.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "macro1.c"
+
+main()
+{
+int i;
+
+
+
+}

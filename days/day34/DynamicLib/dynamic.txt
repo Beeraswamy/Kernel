@@ -1,0 +1,69 @@
+http://codingfreak.blogspot.com/2009/12/creating-and-using-shared-libraries-in.html
+
+Creatig object files for code that goes into shared library:
+-------------------------------------------------------------
+All the code that goes into a shared library needs to be position indepedet code.
+We ca make gcc emit positio independent code by passing it one of the command line
+switches -fpic or -fPIC 
+gcc -c -fPIC calc_mean.c -o calc_mean.o
+
+
+
+Creating the shared library:
+----------------------------
+*Every shared library has a special name called the "soname". 
+*The soname has the prefix "lib", the name of the librayr, the phrase ".so", followed by a dot and a version number that is incremented whenever the interface changes.
+*On a working system a fully qualified soname is simply a symbolic link to the shared library; "real name"
+*Every shared library also has a real name", which is the filename containing the actualy library code.
+The real name adds to the soname a period, a minor number, another period, and the release number. 
+gcc -shared -Wl,-soname,libmean.so.1 -o libmean.so.1.0.1 calc_mean.o 
+
+above command succesfully produces libmean.so.1.0.1
+-shared: Produces a shared object which can then be linked with other objects to form an executable.
+-W1: Pass options to linker
+In this examples the options to be passed on to the linker are "-soname libmean.so.1"
+-The name passed with the -o options are passed to the gcc
+
+mv libmean.so.1.0.1 /home/cf/slib 
+
+Create symbolic links to the created shared libraries.
+------------------------------------------------------
+ln -sf /home/cf/slib/libmean.so.1.0.1 /home/cf/slib/libmean.so  
+ln -sf /home/cf/slib/libmean.so.1.0.1 /home/cf/slib/libmean.so.1 
+
+The link to /home/cf/slib/libmean.so allows the naming convention for the compile flag -lmean to work
+
+Compiling main program and link with shared library
+----------------------------------------------
+gcc -o main main.c -lmean -L/home/cf/slib
+The “-l” option tells the compiler to look for a file named libsomething.so The something is specified by the argument immediately following the “-l”. i.e. -lmean
+
+The “-L” option tells the compiler where to find the library. The path to the directory containing the shared libraries is followd by "-L". If no “-L” is specified, the compiler will search the usual locations.
+
+"-L." means looking for the shared libraries in the current directory and "-L/home/cf/lib" means looking for the shared libraries at "/opt/lib" path. You can specify as many “-l” and “-L” options as you like.
+
+If compilation is successful an executable named "main" is created. We can check if our library is include successfully into the executable by linker using the following command
+
+$ ldd main  
+linux-gate.so.1 =>  (0x00110000)  
+libmean.so.1 => not found  
+libc.so.6 => /lib/libc.so.6 (0x007bf000)  
+/lib/ld-linux.so.2 (0x0079f000)  
+
+You can see that linker cannot find our shared library libmean.so.
+We have to create or set the environment variable "LD_LIBRARY_PATH" to the directory containing the shared libraries. 
+export LD_LIBRARY_PATH=/home/cf/slib 
+
+Now recompile the main program
+gcc -o main main.c -lmean -L/home/cf/slib
+
+Now check the ldd command output
+$ ldd main  
+linux-gate.so.1 =>  (0x00110000)  
+libmean.so.1 => ./libmean.so.1 (0x00111000)  
+libc.so.6 => /lib/libc.so.6 (0x007bf000)  
+/lib/ld-linux.so.2 (0x0079f000)
+
+It seems now linker is able to locate our shared library as we can see in above output. Now run the program
+
+$./main
