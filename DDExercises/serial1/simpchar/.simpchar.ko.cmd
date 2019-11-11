@@ -1,0 +1,1 @@
+cmd_/mnt/test/drivers/new-demo-examples/simpchar/simpchar.ko := ld -m elf_i386 -r -o /mnt/test/drivers/new-demo-examples/simpchar/simpchar.ko /mnt/test/drivers/new-demo-examples/simpchar/simpchar.o /mnt/test/drivers/new-demo-examples/simpchar/simpchar.mod.o

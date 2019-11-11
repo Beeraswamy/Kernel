@@ -1,0 +1,1 @@
+cmd_/tftpboot/modules/cmc/new-demo-examples/timer/timer.ko := ld -m elf_i386 -r -o /tftpboot/modules/cmc/new-demo-examples/timer/timer.ko /tftpboot/modules/cmc/new-demo-examples/timer/timer.o /tftpboot/modules/cmc/new-demo-examples/timer/timer.mod.o

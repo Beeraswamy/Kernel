@@ -1,0 +1,1 @@
+cmd_/home/viven/Desktop/DDExercises/day3/tasklet/mytasklet.ko := ld -r -m elf_i386 -T /usr/src/linux-headers-2.6.38-8-generic/scripts/module-common.lds --build-id  -o /home/viven/Desktop/DDExercises/day3/tasklet/mytasklet.ko /home/viven/Desktop/DDExercises/day3/tasklet/mytasklet.o /home/viven/Desktop/DDExercises/day3/tasklet/mytasklet.mod.o

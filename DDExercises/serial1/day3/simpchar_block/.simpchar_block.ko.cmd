@@ -1,0 +1,1 @@
+cmd_/root/newdemo/day3/simpchar_block/simpchar_block.ko := ld -m elf_i386 -r -o /root/newdemo/day3/simpchar_block/simpchar_block.ko /root/newdemo/day3/simpchar_block/simpchar_block.o /root/newdemo/day3/simpchar_block/simpchar_block.mod.o

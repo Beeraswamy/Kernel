@@ -1,0 +1,1 @@
+cmd_/home/viven/Desktop/DDExercises/day3/timers/timer.ko := ld -r -m elf_i386 -T /usr/src/linux-headers-2.6.38-8-generic/scripts/module-common.lds --build-id  -o /home/viven/Desktop/DDExercises/day3/timers/timer.ko /home/viven/Desktop/DDExercises/day3/timers/timer.o /home/viven/Desktop/DDExercises/day3/timers/timer.mod.o

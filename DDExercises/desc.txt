@@ -1,0 +1,4 @@
+Designed Developed and tested the USB Bluetooth device driver is based on USB2.0 Specificiation which matches class, subclass and protocol. Implemented probe, transmit and receive functionalities. Tested operations like sending and reciving file from and to bluetooth enabled mobile phones. Tested bluetooth mouse.
+
+
+Designed Developed and tested the 16550A UART driver for 16550A UART controller. It contains a 16 byte FIFO's. Implemented transmit, receive and interrupt handling operations. Tested operations like data transfers to another terminals(PC & Embedded Kits).

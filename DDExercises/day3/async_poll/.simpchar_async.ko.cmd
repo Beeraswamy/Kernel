@@ -1,0 +1,1 @@
+cmd_/home/viven/viven/viven/DDExercises/day3/async_poll/simpchar_async.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/viven/viven/viven/DDExercises/day3/async_poll/simpchar_async.ko /home/viven/viven/viven/DDExercises/day3/async_poll/simpchar_async.o /home/viven/viven/viven/DDExercises/day3/async_poll/simpchar_async.mod.o

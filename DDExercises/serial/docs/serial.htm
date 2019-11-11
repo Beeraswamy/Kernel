@@ -1,0 +1,982 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+   <title>Interfacing The Serial / RS-232 Port</title>
+   <meta name="description" content="Describes interfacing the Serial (RS-232) Port in relation to both Hardware and Software. Gives Practical Examples using CDP6402 UART and Software Examples in C.">
+   <meta name="keywords" content="RS232, RS-232, Serial, CPD6402, AY-5-1015, 8250, 16450, 16550, 16650, 16750, UART, MAX-232, COMMS, COM Port, Serial Port, Terminal, Programming in C, Serial Programming, RS-232 Programming">
+</head>
+<body leftmargin="0" topmargin="0" basefont="" face="ARIAL" marginheight="0" marginwidth="0" background="serial_files/bgyellow.gif">
+
+<style type="text/css">
+#TITLEBLOCK { text-decoration: none; color:#FFFFFF }
+TD,P,FONT,A,LI,B {font-family : Arial}
+PRE,TT {color:#100080}
+</style>
+
+<br><center>
+<table boarder="0" width="95%"><tbody><tr>
+  <td width="25%"><center><a href="http://www.beyondlogic.org/"><img src="serial_files/beyondsmall.gif" alt="Beyond Logic" border="0"></a></center></td>
+  <td width="50%"><center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-7725444460812017";
+/* 728x90, created 10/25/10 */
+google_ad_slot = "9436888885";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript" src="serial_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+
+  <noscript><FONT COLOR=RED>This page is optimised with JavaScript 1.2. Currently your browser has JavaScript switched off.</noscript>
+  </center></td>
+  <td valign="CENTER" align="RIGHT"><br><font face="ARIAL">
+  <script language="javascript" src="serial_files/beyondmenu_plain.js"></script><script language="JavaScript1.2" src="serial_files/HM_ScriptDOM.js" type="text/javascript"></script><font size="-1">Monday, October 3rd, 2011</font><br></font></td></tr></tbody></table></center><table frame="Below" cellpadding="1" cellspacing="0" width="100%" border="0"><tbody><tr><td nowrap="nowrap" align="center" bgcolor="BLUE"><font color="WHITE" face="ARIAL"><b><center><a id="TITLEBLOCK" href="http://www.beyondlogic.org/index.htm#USB" onmouseover="HM_f_PopUp('elMenu1',event)" onmouseout="HM_f_PopDown('elMenu1')">Universal Serial Bus</a>&nbsp;<img src="serial_files/HM_More_white_down.gif"></center></b></font></td><td nowrap="nowrap" align="center" bgcolor="BLUE"><font color="WHITE" face="ARIAL"><b><center><a id="TITLEBLOCK" href="http://www.beyondlogic.org/index.htm#uClinux" onmouseover="HM_f_PopUp('elMenu2',event)" onmouseout="HM_f_PopDown('elMenu2')">Embedded Internet</a>&nbsp;<img src="serial_files/HM_More_white_down.gif"></center></b></font></td><td nowrap="nowrap" align="center" bgcolor="BLUE"><font color="WHITE" face="ARIAL"><b><center><a id="TITLEBLOCK" href="http://www.beyondlogic.org/index.htm#Legacy" onmouseover="HM_f_PopUp('elMenu3',event)" onmouseout="HM_f_PopDown('elMenu3')">Legacy Ports</a>&nbsp;<img src="serial_files/HM_More_white_down.gif"></center></b></font></td><td nowrap="nowrap" align="center" bgcolor="BLUE"><font color="WHITE" face="ARIAL"><b><center><a id="TITLEBLOCK" href="http://www.beyondlogic.org/index.htm#DeviceDrivers" onmouseover="HM_f_PopUp('elMenu4',event)" onmouseout="HM_f_PopDown('elMenu4')">Device Drivers</a>&nbsp;<img src="serial_files/HM_More_white_down.gif"></center></b></font></td><td nowrap="nowrap" align="center" bgcolor="BLUE"><font color="WHITE" face="ARIAL"><b><center><a id="TITLEBLOCK" href="http://www.beyondlogic.org/index.htm#Misc" onmouseover="HM_f_PopUp('elMenu5',event)" onmouseout="HM_f_PopDown('elMenu5')">Miscellaneous</a>&nbsp;<img src="serial_files/HM_More_white_down.gif"></center></b></font></td></tr></tbody></table><br>
+<noscript></TD></TR></TABLE></CENTER></noscript>
+
+<center>
+<table width="95%"><tbody><tr><td>
+
+<br><br>
+<center><font color="GREEN" size="5">Interfacing the Serial / RS232 Port</font></center>
+
+<br>
+<br>
+<p>
+The Serial Port is harder to interface than the Parallel Port. In most cases,
+any device you connect to the serial port will need the serial transmission
+converted back to parallel so that it can be used. This can be done using a
+UART. On the software side of things, there are many more registers that you
+have to attend to than on a Standard Parallel Port. (SPP)
+</p>
+<p>
+So what are the advantages of using serial data transfer rather than parallel?
+</p>
+
+<table>
+<tbody><tr><td valign="top">1.</td>
+<td><p>Serial Cables can be longer than Parallel cables. The serial port
+ transmits a '1' as -3 to -25 volts and a '0' as +3 to +25 volts where 
+as a parallel port transmits a '0' as 0v and a '1' as 5v. Therefore the 
+serial port can have a maximum swing of 50V compared to the parallel 
+port which has a maximum swing of 5 Volts. Therefore cable loss is not 
+going to be as much of a problem for serial cables than they are for 
+parallel. 
+</p></td></tr>
+<tr><td valign="top">2.</td><td><p>
+You don't need as many wires than parallel transmission. If your device 
+needs to be mounted a far distance away from the computer then 3 core 
+cable (Null Modem Configuration) is going to be a lot cheaper that 
+running 19 or 25 core cable. However you must take into account the cost
+ of the interfacing at each end.
+</p></td></tr>
+<tr><td valign="top">3.</td><td><p>
+Infra Red devices have proven quite popular recently. You may of seen 
+many electronic diaries and palmtop computers which have infra red 
+capabilities build in. However could you imagine transmitting 8 bits of 
+data at the one time across the room and being able to (from the devices
+ point of view) decipher which bits are which? Therefore serial 
+transmission is used where one bit is sent at a time. IrDA-1 (The first 
+infra red specifications) was capable of 115.2k baud and was interfaced 
+into a UART. The pulse length however was cut down to 3/16th of a RS232 
+bit length to conserve power considering these devices are mainly used 
+on diaries, laptops and palmtops.
+</p></td></tr>
+<tr><td valign="top">4.</td><td><p>
+Microcontroller's have also proven to be quite popular recently. Many of
+these have in built SCI (Serial Communications Interfaces) which can be
+used to talk to the outside world. Serial Communication reduces the pin
+count of these MPU's. Only two pins are commonly used, Transmit Data (TXD)
+and Receive Data (RXD) compared with at least 8 pins if you use a 8 bit
+Parallel method (You may also require a Strobe).
+</p></td></tr>
+</tbody></table>
+
+<a name="TOC"></a><a>
+<p></p><hr>
+<i><font size="+2"><center>Table of Contents</center></font></i>
+<hr><p></p>
+<p>
+</p></a><center><a>
+<font size="+1"><b>Part 1 : Hardware (PC's)</b></font><br>
+</a><a href="#1">Hardware Properties</a><br>
+<a href="#2">Serial Pinouts (D25 and D9 connectors)<br>
+</a><a href="#3">Pin Functions </a><br>
+<a href="#4">Null Modems </a><br>
+<a href="#5">Loopback Plugs</a><br>
+<a href="#6">DTE/DCE Speeds</a><br>
+<a href="#7">Flow Control </a><br>
+<a href="#8">The UART (8250's and Compatibles) </a><br>
+<a href="#9">Type of UARTS (For PC's) </a><br>
+
+<font size="+1"><b>Part 2 : Serial Ports' Registers (PC's)</b></font><br>
+<a href="#12">Port Addresses and IRQ's</a><br>
+<a href="#13">Table of Registers</a><br>
+<a href="#14">DLAB ? </a><br>
+<a href="#15">Interrupt Enable Register (IER)</a><br>
+<a href="#16">Interrupt Identification Register (IIR)</a><br>
+<a href="#17">First In / First Out Control Register (FCR)</a><br>
+<a href="#18">Line Control Register (LCR)</a><br>
+<a href="#19">Modem Control Register (MCR)</a><br>
+<a href="#20">Line Status Register (LSR)</a><br>
+<a href="#21">Modem Status Register (MSR)</a><br>
+<a href="#22">Scratch Register</a><br>
+
+<font size="+1"><b>Part 3 : Programming (PC's)</b></font><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#30">Polling or Interrupt Driven?</a><br>
+<a href="http://www.beyondlogic.org/serial/termpoll.c">Source Code - Termpoll.c (Polling Version)</a><br>
+<a href="http://www.beyondlogic.org/serial/buff1024.c">Source Code - Buff1024.c (ISR Version) </a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#31">Interrupt Vectors</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#32">Interrupt Service Routine</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#33">UART Configuration</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#34">Main Routine (Loop)</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#35">Determining the type of UART via Software</a><br>
+
+<font size="+1"><b>Part 4 : External Hardware - Interfacing Methods</b></font><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#40">RS-232 Waveforms</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#41">RS-232 Level Converters</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#42">Making use of the Serial Format</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#43">8250 and compatable UART's</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#44">CDP6402, AY-5-1015 / D36402R-9 etc UARTs</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#46">Microcontrollers</a><br>
+
+<p></p></center>
+
+<a name="part1"></a>
+<hr width="100%"><i><font size="+2">Part One : Hardware (PC's)</font></i><hr width="100%"><p></p>
+<ul>
+<p><a name="1"><font size="+1"> Hardware Properties</font></a></p><hr><p></p>
+<p>
+Devices which use serial cables for their communication are split into two
+categories. These are DCE (Data Communications Equipment) and DTE (Data
+Terminal Equipment.) Data Communications Equipment are devices such as your
+modem, TA adapter, plotter etc while Data Terminal Equipment is your
+Computer or Terminal.
+</p>
+<p>
+The electrical specifications of the serial port is contained in the EIA
+(Electronics Industry Association) RS232C standard. It states many
+parameters such as -
+</p>
+<center>
+<table width="80%">
+<tbody><tr><td valign="top">1.</td><td>
+A "Space" (logic 0) will be between +3 and +25 Volts.
+</td></tr>
+<tr><td valign="top">2.</td><td>
+A "Mark" (Logic 1) will be between -3 and -25 Volts.
+</td></tr>
+<tr><td valign="top">3.</td><td>
+The region between +3 and -3 volts is undefined. 
+</td></tr>
+<tr><td valign="top">4.</td><td>
+An open circuit voltage should never exceed 25 volts. (In Reference to GND)
+</td></tr>
+<tr><td valign="top">5.</td><td>
+A short circuit current should not exceed 500mA. The driver should be 
+able to handle this without damage. (Take note of this one!)
+</td></tr>
+</tbody></table>
+</center>
+<p>
+Above is no where near a complete list of the EIA standard. Line Capacitance,
+Maximum Baud Rates etc are also included. For more information please consult
+the EIA RS232-C standard. It is interesting to note however, that the RS232C
+standard specifies a maximum baud rate of 20,000 BPS!, which is rather slow
+by today's standards. A new standard, RS-232D has been recently released.
+</p>
+<p>
+Serial Ports come in two "sizes", There are the D-Type 25 pin
+connector and the D-Type 9 pin connector both of which are male on the back
+of the PC, thus you will require a female connector on your device. Below is
+a table of pin connections for the 9 pin and 25 pin D-Type connectors.
+</p>
+<p><a name="2"><font size="+1">Serial Pinouts (D25 and D9 Connectors)</font><br></a></p><hr><p></p>
+<p>
+</p><center>
+<table width="80%" border="1">
+<tbody><tr><td width="25%"><center><b> D-Type-25 Pin No. </b></center></td><td width="25%"><center><b> D-Type-9 Pin No. </b></center></td><td width="20%"><center><b>Abbreviation</b></center></td><td width="30%"><center><b> Full Name </b></center></td></tr>
+<tr><td><center> Pin 2 </center></td><td><center> Pin 3 </center></td><td><center> TD </center></td><td><center> Transmit Data </center></td></tr>
+<tr><td><center> Pin 3 </center></td><td><center> Pin 2 </center></td><td><center> RD </center></td><td><center> Receive Data </center></td></tr>
+<tr><td><center> Pin 4 </center></td><td><center> Pin 7 </center></td><td><center> RTS </center></td><td><center> Request To Send </center></td></tr>
+<tr><td><center> Pin 5 </center></td><td><center> Pin 8 </center></td><td><center> CTS </center></td><td><center> Clear To Send </center></td></tr>
+<tr><td><center> Pin 6 </center></td><td><center> Pin 6 </center></td><td><center> DSR </center></td><td><center> Data Set Ready </center></td></tr>
+<tr><td><center> Pin 7 </center></td><td><center> Pin 5 </center></td><td><center> SG </center></td><td><center> Signal Ground </center></td></tr>
+<tr><td><center> Pin 8 </center></td><td><center> Pin 1 </center></td><td><center> CD </center></td><td><center> Carrier Detect </center></td></tr>
+<tr><td><center> Pin 20 </center></td><td><center> Pin 4 </center></td><td><center> DTR </center></td><td><center> Data Terminal Ready </center></td></tr>
+<tr><td><center> Pin 22 </center></td><td><center> Pin 9 </center></td><td><center> RI </center></td><td><center> Ring Indicator </center></td></tr>
+</tbody></table>
+<font size="-1"><center>Table 1 : D Type 9 Pin and D Type 25 Pin Connectors </center></font>
+</center>
+<p></p>
+
+<p><a name="3"><font size="+1">Pin Functions</font><br></a></p><hr><p></p>
+<p>
+<table>
+<tbody><tr><td>&nbsp;</td><td colspan="2" valign="TOP"><b>Abbreviation</b></td><td valign="TOP"><b>Full Name</b></td><td><b>Function</b></td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;&nbsp;</td><td valign="TOP">TD</td><td valign="TOP">Transmit Data</td><td>Serial Data Output (TXD)</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;&nbsp;</td><td valign="TOP">RD</td><td valign="TOP">Receive Data</td><td>Serial Data Input (RXD)</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;&nbsp;</td><td valign="TOP">CTS</td><td valign="TOP">Clear to Send</td><td>This line indicates that the Modem is ready to exchange data.</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;&nbsp;</td><td valign="TOP">DCD</td><td valign="TOP">Data Carrier Detect</td><td>When the modem detects a "Carrier" from the modem at the other end of the phone line, this Line becomes active.</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;&nbsp;</td><td valign="TOP">DSR</td><td valign="TOP">Data Set Ready</td><td>This tells the UART that the modem is ready to establish a link.</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;&nbsp;</td><td valign="TOP">DTR</td><td valign="TOP">Data Terminal Ready</td><td>This is the opposite to DSR. This tells the Modem that the UART is ready to link.</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;&nbsp;</td><td valign="TOP">RTS</td><td valign="TOP">Request To Send</td><td>This line informs the Modem that the UART is ready to exchange data.</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;&nbsp;</td><td valign="TOP">RI</td><td valign="TOP">Ring Indicator</td><td>Goes active when modem detects a ringing signal from the PSTN.</td></tr>
+</tbody></table>
+</p>
+
+<p><a name="4"><font size="+1">Null Modems</font></a></p><hr><p></p>
+<p>
+A Null Modem is used to connect two DTE's together. This is commonly 
+used as a cheap way to network games or to transfer files between 
+computers using Zmodem Protocol, Xmodem Protocol etc. This can also be 
+used with many Microprocessor Development Systems.</p>
+<center><p><img src="serial_files/nullmode.gif" alt="Null Modem Connections" height="148" width="391">
+<br><font size="-1">Figure 1 : Null Modem Wiring Diagram</font></p></center>
+
+<p>
+Above is my preferred method of wiring a Null Modem. It only requires 3 wires
+(TD, RD &amp; SG) to be wired straight through thus is more cost effective to
+use with long cable runs. The theory of operation is reasonably easy. The
+aim is to make to computer think it is talking to a modem rather than
+another computer. Any data transmitted from the first computer must be
+received by the second thus TD is connected to RD. The second computer
+must have the same set-up thus RD is connected to TD. Signal Ground (SG)
+must also be connected so both grounds are common to each computer.</p>
+<p>
+The Data Terminal Ready is looped back to Data Set Ready and Carrier Detect
+on both computers. When the Data Terminal Ready is asserted active, then the
+Data Set Ready and Carrier Detect immediately become active. At this point
+the computer thinks the Virtual Modem to which it is connected is ready and
+has detected the carrier of the other modem.</p>
+<p>
+All left to worry about now is the Request to Send and Clear To Send. As
+both computers communicate together at the same speed, flow control is not
+needed thus these two lines are also linked together on each computer. When
+the computer wishes to send data, it asserts the Request to Send high and
+as it's hooked together with the Clear to Send, It immediately gets a reply
+that it is ok to send and does so.</p>
+<p>
+Notice that the ring indicator is not connected to anything of each end.
+This line is only used to tell the computer that there is a ringing signal
+on the phone line. As we don't have a modem connected to the phone line this
+is left disconnected.</p>
+
+<a name="5"><font size="+1">LoopBack Plug</font><hr></a><p></p>
+
+<p>
+<table>
+<tbody><tr><td valign="top">
+<center><p><img src="serial_files/loopback.gif" alt="Loopback Plug">
+<br><font size="-1">Figure 2 : Loopback Plug Wiring Diagram</font></p></center>
+</td><td>
+This loopback plug can come in extremely handy when writing Serial / RS232
+Communications Programs. It has the receive and transmit lines connected
+together, so that anything transmitted out of the Serial Port is
+immediately received by the same port. If you connect this to a Serial Port
+an load a Terminal Program, anything you type will be immediately displayed
+on the screen. This can be used with the examples later in this tutorial.<br>
+<br>
+<i>Please note that this is not intended for use with Diagnostic Programs and
+thus will probably not work. For these programs you require a differently
+wired Loop Back plug which may vary from program to program.</i>
+</td></tr>
+</tbody></table>
+</p>
+
+<p>
+<a name="6"><font size="+1">DTE / DCE Speeds</font></a></p><hr><p></p>
+<p>
+We have already talked briefly about DTE &amp; DCE. A typical Data Terminal
+Device is a computer and a typical Data Communications Device is a Modem.
+Often people will talk about DTE to DCE or DCE to DCE speeds. DTE to DCE is
+the speed between your modem and computer, sometimes referred to as your
+terminal speed. This should run at faster speeds than the DCE to DCE speed.
+DCE to DCE is the link between modems, sometimes called the line speed. </p>
+<p>
+Most people today will have 28.8K or 33.6K modems. Therefore we should
+expect the DCE to DCE speed to be either 28.8K or 33.6K. Considering the
+high speed of the modem we should expect the DTE to DCE speed to be
+about 115,200 BPS.(Maximum Speed of the 16550a UART) This is where some
+people often fall into a trap. The communications program
+which they use have settings for DCE to DTE speeds. However they see 9.6
+KBPS, 14.4 KBPS etc and think it is your modem speed. </p>
+<p>
+Today's Modems should have Data Compression build into them. This is very
+much like PK-ZIP but the software in your modem compresses and decompresses
+the data. When set up correctly you can expect compression ratios of 1:4 or
+even higher. 1 to 4 compression would be typical of a text file. If we were
+transferring that text file at 28.8K (DCE-DCE), then when the modem
+compresses it you are actually transferring 115.2 KBPS between computers and
+thus have a DCE-DTE speed of 115.2 KBPS. Thus this is why the DCE-DTE should
+be much higher than your modem's connection speed.</p>
+<p>
+Some modem manufacturers quote a maximum compression ratio as 1:8. Lets say
+for example its on a new 33.6 KBPS modem then we may get a maximum 268,800
+BPS transfer between modem and UART. If you only have a 16550a which can do
+115,200 BPS tops, then you would be missing out on a extra bit of
+performance. Buying a 16C650 should fix your problem with a maximum transfer
+rate of 230,400 BPS.</p>
+<p>
+However don't abuse your modem if you don't get these rates. These are
+MAXIMUM compression ratios. In some instances if you try to send a already
+compressed file, your modem can spend more time trying the compress it, thus
+you get a transmission speed less than your modem's connection speed. If this
+occurs try turning
+off your data compression. This should be fixed on newer modems. Some files
+compress easier than others thus any file which compresses easier is
+naturally going to have a higher compression ratio.</p>
+
+<p><a name="7"><font size="+1">Flow Control</font></a></p><hr><p></p>
+<p>
+So if our DTE to DCE speed is several times faster than our DCE to DCE speed
+the PC can send data to your modem at 115,200 BPS. Sooner or later data is
+going to get lost as buffers overflow, thus flow control is used. Flow control has two basic
+varieties, Hardware or Software.</p>
+<p>
+Software flow control, sometimes expressed as Xon/Xoff uses two characters
+Xon and Xoff. Xon is normally indicated by the ASCII 17 character where as
+the ASCII 19 character is used for Xoff. The modem will only have a small
+buffer so when the computer fills it up the modem sends a Xoff character to
+tell the computer to stop sending data. Once the modem has room for more
+data it then sends a Xon character and the computer sends more data. This
+type of flow control has the advantage that it doesn't require any more
+wires as the characters are sent via the TD/RD lines. However on slow links
+each character requires 10 bits which can slow communications down.</p>
+<p>
+Hardware flow control is also known as RTS/CTS flow control. It uses two
+wires in your serial cable rather than extra characters transmitted in your
+data lines. Thus hardware flow control will not slow down transmission times
+like Xon-Xoff does. When the computer wishes to send data it takes active
+the Request to Send line. If the modem has room for this data, then the
+modem will reply by taking active the Clear to Send line and the computer
+starts sending data. If the modem does not have the room then it will not
+send a Clear to Send.</p>
+
+<p><a name="8"><font size="+1">The UART (8250 and Compatibles)</font></a></p><hr><p></p>
+
+<p>
+UART stands for Universal Asynchronous Receiver / Transmitter. Its the little
+box of tricks found on your serial card which plays the little games with
+your modem or other connected devices. Most cards will have the UART's
+integrated into other chips which may also control your parallel port,
+games port, floppy or hard disk drives and are typically surface mount
+devices. The 8250 series, which includes the 16450, 16550, 16650, &amp; 16750
+UARTS are the most commonly found type in your PC. Later we will look at
+other types which can be used in your homemade devices and projects.
+</p>
+<center><p><img src="serial_files/uart.gif" alt="Pin Diagrams of UARTs - 16550, 16450 &amp; 8250" height="293" width="520">
+<br><font size="-1">Figure 3 : Pin Diagrams for 16550, 16450 &amp; 8250 UARTs</font></p></center>
+<p>
+The 16550 is chip compatible with the 8250 &amp; 16450. The only two differences
+are pins 24 &amp; 29. On the 8250 Pin 24 was chip select out which functioned
+only as a indicator to if the chip was active or not. Pin 29 was not
+connected on the 8250/16450 UARTs.
+The 16550 introduced two new pins in their place. These are Transmit Ready
+and Receive Ready which can be implemented with DMA (Direct Memory Access).
+These Pins have two different modes of operation. Mode 0 supports single
+transfer DMA where as Mode 1 supports Multi-transfer DMA.
+</p>
+<p>
+Mode 0 is also called the 16450 mode. This mode is selected when the FIFO
+buffers are disabled via Bit 0 of the FIFO Control Register or When the
+FIFO buffers are enabled but DMA Mode Select = 0. (Bit 3 of FCR) In this
+mode RXRDY is active low when at least one character (Byte) is present in
+the Receiver Buffer. RXRDY will go inactive high when no more characters are
+left in the Receiver Buffer. TXRDY will be active low when there are no
+characters in the Transmit Buffer. It will go inactive high after the
+first character / byte is loaded into the Transmit Buffer.
+</p>
+<p>
+Mode 1 is when the FIFO buffers are active and the DMA Mode Select = 1. In
+Mode 1, RXRDY will go active low when the trigger level is reached or when
+16550 Time Out occurs and will return to inactive state when no more
+characters are left in the FIFO. TXRDY will be active when no characters
+are present in the Transmit Buffer and will go inactive when the FIFO
+Transmit Buffer is completely Full.
+</p>  
+<p>
+All the UARTs pins are TTL compatible. That includes TD, RD, RI, DCD, DSR,
+CTS, DTR and RTS which all interface into your serial plug, typically a
+D-type connector. Therefore RS232 Level Converters (which we talk about in
+detail later) are used. These are commonly the DS1489 Receiver and the DS1488
+as the PC has +12 and -12 volt rails which can be used by these devices. The
+RS232 Converters will convert the TTL signal into RS232 Logic Levels.
+</p>
+<center>
+<table width="80%" border="1">
+<tbody><tr><td width="10%"><center><b>Pin No.</b></center></td><td width="15%"><center><b>Name</b></center></td><td><b>Notes</b></td></tr>
+<tr><td><center>Pin 1:8</center></td><td><center>D0:D7</center></td><td>Data Bus</td></tr>
+<tr><td><center>Pin 9</center></td><td><center>RCLK</center></td><td>Receiver Clock Input. The frequency of this input should equal the receivers baud rate * 16</td></tr>
+<tr><td><center>Pin 10</center></td><td><center>RD</center></td><td>Receive Data</td></tr>
+<tr><td><center>Pin 11</center></td><td><center>TD</center></td><td>Transmit Data</td></tr>
+<tr><td><center>Pin 12</center></td><td><center>CS0</center></td><td>Chip Select 0 - Active High</td></tr>
+<tr><td><center>Pin 13</center></td><td><center>CS1</center></td><td>Chip Select 1 - Active High</td></tr>
+<tr><td><center>Pin 14</center></td><td><center>nCS2</center></td><td>Chip Select 2 - Active Low</td></tr>
+<tr><td><center>Pin 15</center></td><td><center>nBAUDOUT</center></td><td>Baud Output - Output from Programmable Baud Rate Generator. Frequency = (Baud Rate x 16)</td></tr>
+<tr><td><center>Pin 16</center></td><td><center>XIN</center></td><td>External Crystal Input - Used for Baud Rate Generator Oscillator</td></tr>
+<tr><td><center>Pin 17</center></td><td><center>XOUT</center></td><td>External Crystal Output</td></tr>
+<tr><td><center>Pin 18</center></td><td><center>nWR</center></td><td>Write Line - Inverted</td></tr>
+<tr><td><center>Pin 19</center></td><td><center>WR</center></td><td>Write Line - Not Inverted</td></tr>
+<tr><td><center>Pin 20</center></td><td><center>VSS</center></td><td>Connected to Common Ground</td></tr>
+<tr><td><center>Pin 21</center></td><td><center>RD</center></td><td>Read Line - Inverted</td></tr>
+<tr><td><center>Pin 22</center></td><td><center>nRD</center></td><td>Read Line - Not Inverted</td></tr>
+<tr><td><center>Pin 23</center></td><td><center>DDIS</center></td><td>Driver
+ Disable. This pin goes low when CPU is reading from UART. Can be 
+connected to Bus Transceiver in case of high capacity data bus.</td></tr>
+<tr><td><center>Pin 24</center></td><td><center>nTXRDY</center></td><td>Transmit Ready</td></tr>
+<tr><td><center>Pin 25</center></td><td><center>nADS</center></td><td>Address Strobe. Used if signals are not stable during read or write cycle</td></tr>
+<tr><td><center>Pin 26</center></td><td><center>A2</center></td><td>Address Bit 2</td></tr>
+<tr><td><center>Pin 27</center></td><td><center>A1</center></td><td>Address Bit 1</td></tr>
+<tr><td><center>Pin 28</center></td><td><center>A0</center></td><td>Address Bit 0</td></tr>
+<tr><td><center>Pin 29</center></td><td><center>nRXRDY</center></td><td>Receive Ready</td></tr>
+<tr><td><center>Pin 30</center></td><td><center>INTR</center></td><td>Interrupt Output</td></tr>
+<tr><td><center>Pin 31</center></td><td><center>nOUT2</center></td><td>User Output 2</td></tr>
+<tr><td><center>Pin 32</center></td><td><center>nRTS</center></td><td>Request to Send</td></tr>
+<tr><td><center>Pin 33</center></td><td><center>nDTR</center></td><td>Data Terminal Ready</td></tr>
+<tr><td><center>Pin 34</center></td><td><center>nOUT1</center></td><td>User Output 1</td></tr>
+<tr><td><center>Pin 35</center></td><td><center>MR</center></td><td>Master Reset</td></tr>
+<tr><td><center>Pin 36</center></td><td><center>nCTS</center></td><td>Clear To Send</td></tr>
+<tr><td><center>Pin 37</center></td><td><center>nDSR</center></td><td>Data Set Ready</td></tr>
+<tr><td><center>Pin 38</center></td><td><center>nDCD</center></td><td>Data Carrier Detect</td></tr>
+<tr><td><center>Pin 39</center></td><td><center>nRI</center></td><td>Ring Indicator</td></tr>
+<tr><td><center>Pin 40</center></td><td><center>VDD</center></td><td>+ 5 Volts</td></tr>
+</tbody></table>
+<font size="-1"><center>Table 2 : Pin Assignments for 16550A UART</center></font>
+</center>
+<p>
+The UART requires a Clock to run. If you look at your serial card a
+common crystal found is either a 1.8432 MHZ or a 18.432 MHZ Crystal.
+The crystal in connected to the XIN-XOUT pins of the UART using a few
+extra components which help the crystal to start oscillating. This clock
+will be used for the Programmable Baud Rate Generator which directly
+interfaces into the transmit timing circuits but not directly into the
+receiver timing circuits. For this an external connection mast be made from
+pin 15 (BaudOut) to pin 9 (Receiver clock in.) Note that the clock signal
+will be at Baudrate * 16.
+</p>
+<p>
+If you are serious about pursuing the 16550 UART used in your PC further,
+then would suggest downloading a copy of the PC16550D data sheet from
+<a href="http://www.natsemi.com/">National Semiconductors Site</a>. Data
+sheets are available in .PDF format so you will need Adobe Acrobat Reader to
+read these. <a href="http://www.ti.com/">Texas Instruments</a> has released
+the 16750 UART which has 64 Byte FIFO's. Data Sheets for the TL16C750 are
+available from the Texas Instruments Site. 
+</p>
+
+<p><a name="9"><font size="+1">Types of UARTS (For PC's)</font></a></p><hr><p></p>
+<ul>
+<table>
+<tbody><tr><td valign="TOP" width="10%">8250</td><td>First UART in this 
+series. It contains no scratch register. The 8250A was an improved 
+version of the 8250 which operates faster on the bus side. </td></tr>
+<tr><td valign="TOP" width="10%">8250A</td><td>This UART is faster than the 8250 on the bus side. Looks exactly the same to software than 16450.</td></tr>
+<tr><td valign="TOP" width="10%">8250B</td><td>Very similar to that of the 8250 UART.</td></tr>
+<tr><td valign="TOP" width="10%">16450</td><td>Used in AT's (Improved bus speed over 8250's). Operates comfortably at 38.4KBPS. Still quite common today.</td></tr>
+<tr><td valign="TOP" width="10%">16550</td><td>This was the first 
+generation of buffered UART. It has a 16 byte buffer, however it doesn't
+ work and is replaced with the 16550A.</td></tr>
+<tr><td valign="TOP" width="10%">16550A</td><td>Is the most common UART 
+use for high speed communications eg 14.4K &amp; 28.8K Modems. They made
+ sure the FIFO buffers worked on this UART.</td></tr>
+<tr><td valign="TOP" width="10%">16650</td><td>Very recent breed of UART. Contains a 32 byte FIFO, Programmable X-On / X-Off characters and supports power management.</td></tr>
+<tr><td valign="TOP" width="10%">16750</td><td>Produced by Texas Instruments. Contains a 64 byte FIFO.</td></tr>
+</tbody></table>
+<br>
+</ul>
+</ul>
+
+
+<a name="part2"></a>
+<hr><i><font size="+2">Part Two : Serial Port's Registers (PC's)</font></i><hr><p></p>
+<ul>
+
+<p><a name="12"><font size="+1">Port Addresses &amp; IRQ's</font><br></a></p><hr><p></p>
+<center>
+<table width="60%" border="1">
+<tbody><tr><td><center><b>Name </b></center></td><td><center><b>Address</b></center></td><td><center><b>IRQ</b></center></td></tr>
+<tr><td><center>COM 1 </center></td><td><center> 3F8 </center></td><td><center>4</center></td></tr>
+<tr><td><center>COM 2 </center></td><td><center> 2F8 </center></td><td><center>3</center></td></tr>
+<tr><td><center>COM 3 </center></td><td><center> 3E8 </center></td><td><center>4</center></td></tr>
+<tr><td><center>COM 4 </center></td><td><center> 2E8 </center></td><td><center>3</center></td></tr>
+</tbody></table>
+<font size="-1">Table 3 : Standard Port Addresses </font>
+</center>
+<p>
+Above is the standard port addresses. These should work for most P.C's. If
+you just happen to be lucky enough to own a IBM P/S2 which has a
+micro-channel bus, then expect a different set of addresses and IRQ's.
+Just like the LPT ports, the base addresses for the COM ports can be read
+from the BIOS Data Area. 
+</p>
+
+<center>
+<table width="60%" border="1">
+<tbody><tr><td width="40%"><b><center>Start Address</center><b></b></b></td><td width="60%"><b><center>Function</center><b></b></b></td></tr>
+<tr><td><center>0000:0400</center></td><td>COM1's Base Address</td></tr>
+<tr><td><center>0000:0402</center></td><td>COM2's Base Address</td></tr>
+<tr><td><center>0000:0404</center></td><td>COM3's Base Address</td></tr>
+<tr><td><center>0000:0406</center></td><td>COM4's Base Address</td></tr>
+</tbody></table>
+<font size="-1">Table 4 - COM Port Addresses in the BIOS Data Area;</font></center>
+<p>
+The above table shows the address at which we can find the Communications (COM)
+ports addresses in the BIOS Data Area. Each address will take up 2 bytes. The
+following sample program in C, shows how you can read these locations to obtain
+the addresses of your communications ports.
+</p>
+<ul>
+<pre>#include &lt;stdio.h&gt;
+#include &lt;dos.h&gt;
+
+void main(void)
+{
+ unsigned int far *ptraddr;  /* Pointer to location of Port Addresses */
+ unsigned int address;       /* Address of Port */
+ int a;
+
+ ptraddr=(unsigned int far *)0x00000400;
+
+ for (a = 0; a &lt;  4; a++)
+   {
+    address = *ptraddr;
+    if (address == 0)
+                printf("No port found for COM%d \n",a+1);
+    else
+                printf("Address assigned to COM%d is %Xh\n",a+1,address);
+    *ptraddr++;
+   }
+}
+</pre>
+</ul>
+<p><a name="13"><font size="+1">Table of Registers</font><br></a></p><hr><p></p>
+<p>
+</p><center>
+<table border="1">
+<tbody><tr><td><center><b>Base Address</b></center></td><td><center><b>DLAB</b></center></td><td><center><b>Read/Write</b></center></td><td><center><b> Abr.  </b></center></td><td><center><b> Register Name </b></center></td></tr>
+<tr><td rowspan="3"><center> + 0</center></td><td><center>=0</center></td><td><center>Write</center></td><td><center> - </center></td><td><center> Transmitter Holding Buffer </center></td></tr>
+<tr><td><center>=0</center></td><td><center>Read</center></td><td><center> - </center></td><td><center> Receiver Buffer </center></td></tr>
+<tr><td><center>=1</center></td><td><center>Read/Write</center></td><td><center> - </center></td><td><center> Divisor Latch Low Byte </center></td></tr>
+<tr><td rowspan="2"><center> + 1</center></td><td><center>=0</center></td><td><center>Read/Write</center></td><td><center> IER </center></td><td><center> Interrupt Enable Register </center></td></tr>
+<tr><td><center>=1</center></td><td><center>Read/Write</center></td><td><center> - </center></td><td><center> Divisor Latch High Byte </center></td></tr>
+<tr><td rowspan="2"><center> + 2</center></td><td><center>-</center></td><td><center>Read</center></td><td><center> IIR </center></td><td><center> Interrupt Identification Register</center></td></tr>
+<tr><td><center>-</center></td><td><center>Write</center></td><td><center> FCR </center></td><td><center> FIFO Control Register </center></td></tr>
+<tr><td><center> + 3</center></td><td><center>-</center></td><td><center>Read/Write</center></td><td><center> LCR </center></td><td><center> Line Control Register </center></td></tr>
+<tr><td><center> + 4</center></td><td><center>-</center></td><td><center>Read/Write</center></td><td><center> MCR </center></td><td><center> Modem Control Register </center></td></tr>
+<tr><td><center> + 5</center></td><td><center>-</center></td><td><center>Read</center></td><td><center> LSR </center></td><td><center> Line Status Register </center></td></tr>
+<tr><td><center> + 6</center></td><td><center>-</center></td><td><center>Read</center></td><td><center> MSR </center></td><td><center> Modem Status Register </center></td></tr>
+<tr><td><center> + 7</center></td><td><center>-</center></td><td><center>Read/Write</center></td><td><center> - </center></td><td><center> Scratch Register </center></td></tr>
+</tbody></table>
+<font size="-1"><center>Table 5 : Table of Registers</center></font>
+</center>
+<p></p>
+
+
+<p><a name="14"><font size="+1">DLAB ?</font><br></a></p><hr><p></p>
+<p>
+You will have noticed in the table of registers that there is a DLAB column.
+When DLAB is set to '0' or '1' some of the registers change. This is how the
+UART is able to have 12 registers (including the scratch register) through
+only 8 port addresses. DLAB stands for Divisor Latch Access Bit. When DLAB
+is set to '1' via the line control register, two registers become available
+from which you can set your speed of communications measured in bits per
+second.</p>
+<p>
+The UART will have a crystal which should oscillate around 1.8432 MHZ. The
+UART incorporates a divide by 16 counter which simply divides the incoming
+clock signal by 16. Assuming we had the 1.8432 MHZ clock signal, that would
+leave us with a maximum, 115,200 hertz signal making the UART capable of
+transmitting and receiving at 115,200 Bits Per Second (BPS). That would be
+fine for some of the faster modems and devices which can handle that speed,
+but others just wouldn't communicate at all. Therefore the UART is fitted
+with a Programmable Baud Rate Generator which is controlled by two registers.</p>
+<p>
+Lets say for example we only wanted to communicate at 2400 BPS. We worked
+out that we would have to divide 115,200 by 48 to get a workable 2400 Hertz
+Clock. The "Divisor", in this case 48, is stored in the two registers
+controlled by the "Divisor Latch Access Bit". This divisor can be any number
+which can be stored in 16 bits (ie 0 to 65535). The UART only has a 8 bit
+data bus, thus this is where the two registers are used. The first register
+(Base + 0) when DLAB = 1 stores the "Divisor latch low byte" where as the
+second register (base + 1 when DLAB = 1) stores the "Divisor latch high
+byte."</p>
+<p>
+Below is a table of some more common speeds and their divisor latch high
+bytes &amp; low bytes. Note that all the divisors are shown in Hexadecimal.</p>
+<p>
+</p><center>
+<table border="1">
+<tbody><tr><td><center><b> Speed (BPS) </b></center></td> <td><center><b> Divisor (Dec) </b></center></td> <td><center><b> Divisor Latch High Byte </b></center></td><td><center><b> Divisor Latch Low Byte </b></center></td></tr>
+<tr><td><center> 50 </center></td><td><center> 2304 </center></td> <td><center> 09h </center></td> <td><center> 00h </center></td></tr>
+<tr><td><center> 300 </center></td><td><center> 384 </center></td> <td><center> 01h </center></td> <td><center> 80h </center></td></tr>
+<tr><td><center> 600 </center></td><td><center> 192 </center></td> <td><center> 00h </center></td> <td><center> C0h </center></td></tr>
+<tr><td><center> 2400 </center></td><td><center> 48 </center></td> <td><center> 00h </center></td> <td><center> 30h </center></td></tr>
+<tr><td><center> 4800 </center></td><td><center> 24 </center></td> <td><center> 00h </center></td> <td><center> 18h </center></td></tr>
+<tr><td><center> 9600 </center></td><td><center> 12 </center></td> <td><center> 00h </center></td> <td><center> 0Ch </center></td></tr>
+<tr><td><center> 19200 </center></td><td><center> 6 </center></td> <td><center> 00h </center></td> <td><center> 06h </center></td></tr>
+<tr><td><center> 38400 </center></td><td><center> 3 </center></td> <td><center> 00h </center></td> <td><center> 03h </center></td></tr>
+<tr><td><center> 57600 </center></td><td><center> 2 </center></td> <td><center> 00h </center></td> <td><center> 02h </center></td></tr>
+<tr><td><center> 115200 </center></td><td><center> 1 </center></td> <td><center> 00h </center></td> <td><center> 01h </center></td></tr>
+</tbody></table>
+<font size="-1">Table 6 : Table of Commonly Used Baudrate Divisors</font>
+</center>
+<p></p>
+
+<p><a name="15"></a><font size="+1">Interrupt Enable Register (IER)</font><br></p><hr><p></p>
+<p>
+</p><center>
+<table width="80%" border="1">
+<tbody><tr><td><center><b>Bit</b></center></td><td><center><b>Notes</b></center></td></tr>
+<tr><td><center>Bit 7</center></td><td>Reserved</td></tr>
+<tr><td><center>Bit 6</center></td><td>Reserved</td></tr>
+<tr><td><center>Bit 5</center></td><td>Enables Low Power Mode (16750)</td></tr>
+<tr><td><center>Bit 4</center></td><td>Enables Sleep Mode (16750)</td></tr>
+<tr><td><center>Bit 3</center></td><td>Enable Modem Status Interrupt</td></tr>
+<tr><td><center>Bit 2</center></td><td>Enable Receiver Line Status Interrupt</td></tr>
+<tr><td><center>Bit 1</center></td><td>Enable Transmitter Holding Register Empty Interrupt</td></tr>
+<tr><td><center>Bit 0</center></td><td>Enable Received Data Available Interrupt</td></tr>
+</tbody></table>
+<font size="-1"><center>Table 7 : Interrupt Enable Register</center></font>
+</center>
+<p></p>
+<p>
+The Interrupt Enable Register could possibly be one of the easiest 
+registers on a UART to understand. Setting Bit 0 high enables the 
+Received Data Available Interrupt which generates an interrupt when the 
+receiving register/FIFO contains data to be read by the CPU. 
+</p>
+<p>
+Bit 1 enables Transmit Holding Register Empty Interrupt. This interrupts
+ the CPU when the transmitter buffer is empty.
+Bit 2 enables the receiver line status interrupt. The UART will 
+interrupt when the receiver line status changes. Likewise for bit 3 
+which enables the modem status interrupt.
+Bits 4 to 7 are the easy ones. They are simply reserved. (If only 
+everything was that easy!)
+</p>
+<p><a name="16"><font size="+1">Interrupt Identification Register (IIR)</font><br></a></p><hr><p></p>
+<p>
+</p><center>
+<table width="80%" border="1">
+<tbody><tr><td><center><b>Bit</b></center></td><td colspan="3"><center><b>Notes</b></center></td></tr>
+<tr><td rowspan="4" valign="top"><center>Bits 6 and 7</center></td><td><center>Bit 6</center></td><td><center>Bit 7</center></td><td>&nbsp;</td></tr>
+<tr>                                                   <td><center>0</center></td><td><center>0</center></td><td>No FIFO </td></tr>
+<tr>                                                   <td><center>0</center></td><td><center>1</center></td><td>FIFO Enabled but Unusable </td></tr>
+<tr>                                                   <td><center>1</center></td><td><center>1</center></td><td>FIFO Enabled </td></tr>
+<tr><td><center>Bit 5</center></td><td colspan="3">64 Byte Fifo Enabled (16750 only)</td></tr>
+<tr><td><center>Bit 4</center></td><td colspan="3">Reserved</td></tr>
+<tr><td rowspan="2" valign="top"><center>Bit 3</center></td><td><center>0</center></td><td colspan="2">Reserved on 8250, 16450</td></tr>
+<tr>                                           <td><center>1</center></td><td colspan="2">16550 Time-out Interrupt Pending</td></tr>
+<tr><td rowspan="5" valign="top"><center>Bits 1 and 2</center></td><td><center>Bit 2</center></td><td><center>Bit 1</center></td><td>&nbsp; </td></tr>
+<tr>                                                   <td><center>0</center></td><td><center>0</center></td><td>Modem Status Interrupt </td></tr>
+<tr>                                                   <td><center>0</center></td><td><center>1</center></td><td>Transmitter Holding Register Empty Interrupt</td></tr>
+<tr>                                                   <td><center>1</center></td><td><center>0</center></td><td>Received Data Available Interrupt</td></tr>
+<tr>                                                   <td><center>1</center></td><td><center>1</center></td><td>Receiver Line Status Interrupt</td></tr>
+<tr><td rowspan="2" valign="top"><center>Bit 0</center></td><td><center>0</center></td><td colspan="2">Interrupt Pending</td></tr>
+<tr>                                           <td><center>1</center></td><td colspan="2">No Interrupt Pending</td></tr>
+</tbody></table>
+<font size="-1"><center>Table 8 : Interrupt Identification Register </center></font>
+</center>
+<p>
+The interrupt identification register is a read only register. Bits 6 and 7
+give status on the FIFO Buffer. When both bits are '0' no FIFO buffers are
+active. This should be the only result you will get from a 8250 or 16450.
+If bit 7 is active but bit 6 is not active then the UART has it's buffers
+enabled but are unusable. This occurs on the 16550 UART where a bug in
+the FIFO buffer made the FIFO's unusable. If both bits are '1' then the
+FIFO buffers are enabled and fully operational.
+</p>
+<p>
+Bits 4 and 5 are reserved. Bit 3 shows the status of the time-out interrupt on a 16550 or higher.
+</p>
+<p>
+Lets jump to Bit 0 which shows whether an interrupt has occurred. If an 
+interrupt has occurred it's status will shown by bits 1 and 2. These 
+interrupts work on a priority status. The Line Status Interrupt has the 
+highest Priority, followed by the Data Available Interrupt, then the 
+Transmit Register Empty Interrupt and then the Modem Status Interrupt 
+which has the lowest priority. 
+</p>
+<p>
+</p>
+<p><a name="17"></a><font size="+1">First In / First Out Control Register (FCR)</font><br></p><hr><p></p>
+<p>
+</p><center>
+<table width="80%" border="1">
+<tbody><tr><td><center><b>Bit</b></center></td><td colspan="3"><center><b>Notes</b></center></td></tr>
+<tr><td rowspan="5" valign="top"><center>Bits 6 and 7</center></td><td><center>Bit 7</center></td><td><center>Bit 6</center></td><td>Interrupt Trigger Level </td></tr>
+<tr>                                                   <td><center>0</center></td><td><center>0</center></td><td>1 Byte </td></tr>
+<tr>                                                   <td><center>0</center></td><td><center>1</center></td><td>4 Bytes </td></tr>
+<tr>                                                   <td><center>1</center></td><td><center>0</center></td><td>8 Bytes </td></tr>
+<tr>                                                   <td><center>1</center></td><td><center>1</center></td><td>14 Bytes</td></tr>
+<tr><td><center>Bit 5</center></td><td colspan="3">Enable 64 Byte FIFO (16750 only)</td></tr>
+<tr><td><center>Bit 4</center></td><td colspan="3">Reserved</td></tr>
+<tr><td><center>Bit 3</center></td><td colspan="3">DMA Mode Select. Change status of RXRDY &amp; TXRDY pins from mode 1 to mode 2.</td></tr>
+<tr><td><center>Bit 2</center></td><td colspan="3">Clear Transmit FIFO</td></tr>
+<tr><td><center>Bit 1</center></td><td colspan="3">Clear Receive FIFO</td></tr>
+<tr><td><center>Bit 0</center></td><td colspan="3">Enable FIFO's</td></tr>
+</tbody></table>
+<font size="-1"><center>Table 9 : FIFO Control Register </center></font>
+</center>
+<p></p>
+<p>
+The FIFO register is a write only register. This register is used to 
+control the FIFO (First In / First Out) buffers which are found on 
+16550's and higher.
+</p>
+<p>
+Bit 0 enables the operation of the receive and transmit FIFO's. Writing a
+ '0' to this bit will disable the operation of transmit and receive 
+FIFO's, thus you will loose all data stored in these FIFO buffers.
+</p>
+<p>
+Bit's 1 and 2 control the clearing of the transmit or receive FIFO's. 
+Bit 1 is responsible for the receive buffer while bit 2 is responsible 
+for the transmit buffer. Setting these bits to 1 will only clear the 
+contents of the FIFO and will not affect the shift registers. These two 
+bits are self resetting, thus you don't need to set the bits to '0' when
+ finished.
+</p>
+Bit 3 enables the DMA mode select which is found on 16550 UARTs and 
+higher. More on this later. Bits 4 and 5 are those easy type again, 
+Reserved.
+<p></p>
+<p>
+Bits 6 and 7 are used to set the triggering level on the Receive FIFO. 
+For example if bit 7 was set to '1' and bit 6 was set to '0' then the 
+trigger level is set to 8 bytes. When there is 8 bytes of data in the 
+receive FIFO then the Received Data Available interrupt is set. See 
+(IIR)
+</p>
+<p>
+<a name="18"></a>
+<font size="+1">Line Control Register (LCR)</font><br></p><hr><p></p>
+<p>
+</p><center>
+<table width="80%" border="1">
+<tbody><tr><td rowspan="2" valign="top"><center>Bit 7</center></td><td><center>1</center></td><td colspan="3">Divisor Latch Access Bit</td></tr>
+<tr>                                           <td><center>0</center></td><td colspan="3">Access to Receiver buffer, Transmitter buffer &amp; Interrupt Enable Register</td></tr>
+<tr><td><center>Bit 6</center></td><td colspan="4">Set Break Enable</td></tr>
+<tr><td rowspan="6" valign="top"><center>Bits 3, 4 And 5</center></td><td width="8%"><center>Bit 5</center></td><td width="8%"><center>Bit 4</center></td><td width="8%"><center>Bit 3</center></td><td>Parity Select</td></tr>
+<tr>                                                                <td><center>X</center></td><td><center>X</center></td><td><center>0</center></td><td>No Parity </td></tr>
+<tr>                                                                <td><center>0</center></td><td><center>0</center></td><td><center>1</center></td><td>Odd Parity </td></tr>
+<tr>                                                                <td><center>0</center></td><td><center>1</center></td><td><center>1</center></td><td>Even Parity </td></tr>
+<tr>                                                                <td><center>1</center></td><td><center>0</center></td><td><center>1</center></td><td>High Parity (Sticky)</td></tr>
+<tr>                                                                <td><center>1</center></td><td><center>1</center></td><td><center>1</center></td><td>Low Parity (Sticky)</td></tr>
+<tr><td rowspan="3" valign="top"><center>Bit 2</center></td><td colspan="4">Length of Stop Bit</td></tr>
+<tr>                                           <td><center>0</center></td><td colspan="3">One Stop Bit</td></tr>
+<tr>                                           <td><center>1</center></td><td colspan="3">2 Stop bits for words of length 6,7 or 8 bits or 1.5 Stop Bits for Word lengths of 5 bits.</td></tr>
+<tr><td rowspan="5" valign="top"><center>Bits 0 And 1</center></td><td><center>Bit 1</center></td><td><center>Bit 0</center></td><td colspan="2">Word Length</td></tr>
+<tr>                                                   <td><center>0</center></td><td><center>0</center></td><td colspan="2">5 Bits </td></tr>
+<tr>                                                   <td><center>0</center></td><td><center>1</center></td><td colspan="2">6 Bits </td></tr>
+<tr>                                                   <td><center>1</center></td><td><center>0</center></td><td colspan="2">7 Bits </td></tr>
+<tr>                                                   <td><center>1</center></td><td><center>1</center></td><td colspan="2">8 Bits </td></tr>
+</tbody></table>
+<font size="-1"><center>Table 10 : Line Control Register </center></font>
+</center>
+<p></p>
+<p>
+The Line Control register sets the basic parameters for communication. 
+Bit 7 is the Divisor Latch Access Bit or DLAB for short. We have already
+ talked about what it does. (See DLAB?) Bit 6 Sets break enable. When 
+active, the TD line goes into "Spacing" state which causes a break in 
+the receiving UART. Setting this bit to '0' Disables the Break.</p>
+<p>
+Bits 3,4 and 5 select parity. If you study the 3 bits, you will find 
+that bit 3 controls parity. That is, if it is set to '0' then no parity 
+is used, but if it is set to '1' then parity is used. Jumping to bit 5, 
+we can see that it controls sticky parity. Sticky parity is simply when 
+the parity bit is always transmitted and checked as a '1' or '0'. This 
+has very little success in checking for errors as if the first 4 bits 
+contain errors but the sticky parity bit contains the appropriately set 
+bit, then a parity error will not result. Sticky high parity is the use 
+of a '1' for the parity bit, while the opposite, sticky low parity is 
+the use of a '0' for the parity bit.
+</p>
+<p>
+If bit 5 controls sticky parity, then turning this bit off must produce 
+normal parity provided bit 3 is still set to '1'. Odd parity is when the
+ parity bit is transmitted as a '1' or '0' so that there is a odd number
+ of 1's. Even parity must then be the parity bit produces and even 
+number of 1's. This provides better error checking but still is not 
+perfect, thus CRC-32 is often used for software error correction. If one
+ bit happens to be inverted with even or odd parity set, then a parity 
+error will occur, however if two bits are flipped in such a way that it 
+produces the correct parity bit then an parity error will no occur.
+</p>
+<p>
+Bit 2 sets the length of the stop bits. Setting this bit to '0' will 
+produce one stop bit, however setting it to '1' will produce either 1.5 
+or 2 stop bits depending upon the word length. Note that the receiver 
+only checks the first stop bit.
+</p>
+<p>
+Bits 0 and 1 set the word length. This should be pretty straight forward. A word length of 8 bits is most commonly used today.
+</p>
+<p>
+<a name="19"></a><font size="+1">Modem Control Register (MCR)</font><br></p><hr><p></p>
+<p>
+</p><center>
+<table width="80%" border="1">
+<tbody><tr><td><center><b>Bit</b></center></td><td><center><b>Notes</b></center></td></tr>
+<tr><td><center>Bit 7</center></td><td>Reserved</td></tr>
+<tr><td><center>Bit 6</center></td><td>Reserved</td></tr>
+<tr><td><center>Bit 5</center></td><td>Autoflow Control Enabled (16750 only)</td></tr>
+<tr><td><center>Bit 4</center></td><td>LoopBack Mode </td></tr>
+<tr><td><center>Bit 3</center></td><td>Aux Output 2</td></tr>
+<tr><td><center>Bit 2</center></td><td>Aux Output 1</td></tr>
+<tr><td><center>Bit 1</center></td><td>Force Request to Send</td></tr>
+<tr><td><center>Bit 0</center></td><td>Force Data Terminal Ready</td></tr>
+</tbody></table>
+<font size="-1"><center>Table 11 : Modem Control Register </center></font>
+</center>
+<p></p>
+<p>
+The Modem Control Register is a Read/Write Register. Bits 5,6 and 7 are 
+reserved. Bit 4 activates the loopback mode. In Loopback mode the 
+transmitter serial output is placed into marking state. The receiver 
+serial input is disconnected. The transmitter out is looped back to the 
+receiver in. DSR, CTS, RI &amp; DCD are disconnected. DTR, RTS, OUT1 
+&amp; OUT2 are connected to the modem control inputs. The modem control 
+output pins are then place in an inactive state. In this mode any data 
+which is placed in the transmitter registers for output is received by 
+the receiver circuitry on the same chip and is available at the receiver
+ buffer. This can be used to test the UARTs operation.</p>
+<p>
+Aux Output 2 maybe connected to external circuitry which controls the 
+UART-CPU interrupt process. Aux Output 1 is normally disconnected, but 
+on some cards is used to switch between a 1.8432MHZ crystal to a 4MHZ 
+crystal which is used for MIDI. Bits 0 and 1 simply control their 
+relevant data lines. For example setting bit 1 to '1' makes the request 
+to send line active.
+</p>
+<p>
+<a name="20"></a>
+<font size="+1">Line Status Register (LSR)</font><br></p><hr><p></p>
+<center>
+<table width="80%" border="1">
+<tbody><tr><td><center><b>Bit</b></center></td><td><center><b>Notes</b></center></td></tr>
+<tr><td><center>Bit 7</center></td><td>Error in Received FIFO</td></tr>
+<tr><td><center>Bit 6</center></td><td>Empty Data Holding Registers </td></tr>
+<tr><td><center>Bit 5</center></td><td>Empty Transmitter Holding Register</td></tr>
+<tr><td><center>Bit 4</center></td><td>Break Interrupt </td></tr>
+<tr><td><center>Bit 3</center></td><td>Framing Error</td></tr>
+<tr><td><center>Bit 2</center></td><td>Parity Error</td></tr>
+<tr><td><center>Bit 1</center></td><td>Overrun Error</td></tr>
+<tr><td><center>Bit 0</center></td><td>Data Ready</td></tr>
+</tbody></table>
+<font size="-1"><center>Table 12 : Line Status Register </center></font>
+</center>
+<p>
+The line status register is a read only register. Bit 7 is the error in 
+received FIFO bit. This bit is high when at least one break, parity or 
+framing error has occurred on a byte which is contained in the FIFO.
+</p>
+When bit 6 is set, both the transmitter holding register and the shift 
+register are empty. The UART's holding register holds the next byte of 
+data to be sent in parallel fashion. The shift register is used to 
+convert the byte to serial, so that it can be transmitted over one line.
+ When bit 5 is set, only the transmitter holding register is empty. So 
+what's the difference between the two? When bit 6, the transmitter 
+holding and shift registers are empty, no serial conversions are taking 
+place so there should be no activity on the transmit data line. When bit
+ 5 is set, the transmitter holding register is empty, thus another byte 
+can be sent to the data port, but a serial conversion using the shift 
+register may be taking place.
+<p></p>
+<p>
+The break interrupt (Bit 4) occurs when the received data line is held 
+in a logic state '0' (Space) for more than the time it takes to send a 
+full word. That includes the time for the start bit, data bits, parity 
+bits and stop bits. 
+</p>
+<p>
+A framing error (Bit 3) occurs when the last bit is not a stop bit. This
+ may occur due to a timing error. You will most commonly encounter a 
+framing error when using a null modem linking two computers or a 
+protocol analyzer when the speed at which the data is being sent is 
+different to that of what you have the UART set to receive it at.
+</p>
+<p> A overrun error normally occurs when your program can't read from 
+the port fast enough. If you don't get an incoming byte out of the 
+register fast enough, and another byte just happens to be received, then
+ the last byte will be lost and a overrun error will result.
+</p>
+<p> Bit 0 shows data ready, which means that a byte has been received by the UART and is at the receiver buffer ready to be read. </p>
+
+<p>
+<a name="21"></a>
+<font size="+1">Modem Status Register (MSR)</font><br></p><hr><p></p>
+<center>
+<table width="80%" border="1">
+<tbody><tr><td><center><b>Bit</b></center></td><td><center><b>Notes</b></center></td></tr>
+<tr><td><center>Bit 7</center></td><td>Carrier Detect</td></tr>
+<tr><td><center>Bit 6</center></td><td>Ring Indicator </td></tr>
+<tr><td><center>Bit 5</center></td><td>Data Set Ready</td></tr>
+<tr><td><center>Bit 4</center></td><td>Clear To Send </td></tr>
+<tr><td><center>Bit 3</center></td><td>Delta Data Carrier Detect</td></tr>
+<tr><td><center>Bit 2</center></td><td>Trailing Edge Ring Indicator</td></tr>
+<tr><td><center>Bit 1</center></td><td>Delta Data Set Ready</td></tr>
+<tr><td><center>Bit 0</center></td><td>Delta Clear to Send</td></tr>
+</tbody></table>
+<font size="-1"><center>Table 13 : Modem Status Register </center></font>
+
+</center>
+
+<p>
+Bit 0 of the modem status register shows delta clear to send, delta 
+meaning a change in, thus delta clear to send means that there was a 
+change in the clear to send line, since the last read of this register. 
+This is the same for bits 1 and 3. Bit 1 shows a change in the Data Set 
+Ready line where as Bit 3 shows a change in the Data Carrier Detect 
+line. Bit 2 is the Trailing Edge Ring Indicator which indicates that 
+there was a transformation from low to high state on the Ring Indicator 
+line.
+</p>
+<p>
+Bits 4 to 7 show the current state of the data lines when read. Bit 7 
+shows Carrier Detect, Bit 6 shows Ring Indicator, Bit 5 shows Data Set 
+Ready &amp; Bit 4 shows the status of the Clear To Send line. 
+</p>
+<p>
+<a name="22"></a>
+<font size="+1">Scratch Register</font><br></p><hr><p></p>
+<p>
+The scratch register is not used for communications but rather used as a
+ place to leave a byte of data. The only real use it has is to determine
+ whether the UART is a 8250/8250B or a 8250A/16450 and even that is not 
+very practical today as the 8250/8250B was never designed for AT's and 
+can't hack the bus speed. 
+</p>
+<br><br>
+<center>
+<p>
+<font size="+1"><b>Part 3 : Programming (PC's)</b></font><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#30">Polling or Interrupt Driven?</a><br>
+<a href="http://www.beyondlogic.org/serial/termpoll.c">Source Code - Termpoll.c (Polling Version)</a><br>
+<a href="http://www.beyondlogic.org/serial/buff1024.c">Source Code - Buff1024.c (ISR Version) </a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#31">Interrupt Vectors</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#32">Interrupt Service Routine</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#33">UART Configuration</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#34">Main Routine (Loop)</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#35">Determining the type of UART via Software</a><br>
+
+<font size="+1"><b>Part 4 : External Hardware - Interfacing Methods</b></font><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#40">RS-232 Waveforms</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#41">RS-232 Level Converters</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#42">Making use of the Serial Format</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#43">8250 and compatable UART's</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#44">CDP6402, AY-5-1015 / D36402R-9 etc UARTs</a><br>
+<a href="http://www.beyondlogic.org/serial/serial1.htm#46">Microcontrollers</a><br>
+</p>
+</center>
+<br><br>
+</ul></td></tr>
+</tbody></table>
+<br><br>
+<font size="2">Copyright 1999-2010 <a href="http://www.beyondlogic.org/about.htm">Craig Peacock</a> 25th October 2010.</font>
+<br><br>
+</center>
+
+
+<div style="position: absolute; visibility: hidden; left: -500px; top: 0px; width: 298px; border-width: 1px; border-color: rgb(93, 108, 168); border-style: solid; overflow: hidden; cursor: default; height: 370px;" id="HM_Menu1"><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 0px;" id="HM_Item1_1">USB in a Nutshell - Introduction</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 17px;" id="HM_Item1_2">USB in a Nutshell - Hardware</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 34px;" id="HM_Item1_3">USB in a Nutshell - USB Protocols</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 51px;" id="HM_Item1_4">USB in a Nutshell - Endpoint Types</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 68px;" id="HM_Item1_5">USB in a Nutshell - USB Descriptors</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 85px;" id="HM_Item1_6">USB in a Nutshell - USB Requests</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 102px;" id="HM_Item1_7">USB in a Nutshell - Enumeration</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 119px;" id="HM_Item1_8">PIC16F87x and PDIUSBD11 USB Example</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 136px;" id="HM_Item1_9">USB 1.1 Integrated Circuits</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 153px;" id="HM_Item1_10">USB 2.0 Integrated Circuits</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 170px;" id="HM_Item1_11">USB Protocol Analysers</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 187px;" id="HM_Item1_12">USB Device Driver Development</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 204px;" id="HM_Item1_13">USB with the simplicity of RS-232</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 221px;" id="HM_Item1_14">On-The-Go Supplement - Point-to-Point Connectivity for USB.</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 254px;" id="HM_Item1_15">ISP1161 Host Controller for Embedded Systems</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 287px;" id="HM_Item1_16">PDIUSBD11 USB Interface</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 304px;" id="HM_Item1_17">Win 2000/XP Driver for DeVaSys USBLPT-PD11 USB Boards</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 337px;" id="HM_Item1_18">USB Driver for the Cypress USB Starter Kit</div><div style="position: absolute; visibility: inherit; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; width: 293px; left: 0px; top: 354px;" id="HM_Item1_19"><img style="position: relative; margin-top: 2px; margin-right: -5px; float: right;" src="serial_files/HM_More_white_right.gif" hspace="0" vspace="0" width="5">Links</div></div><div style="position: absolute; visibility: hidden; left: -500px; top: 0px; width: 298px; border-width: 1px; border-color: rgb(93, 108, 168); border-style: solid; overflow: hidden; cursor: default; height: 166px;" id="HM_Menu2"><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 0px;" id="HM_Item2_1">Ethernet &amp; TCP/IP Interfaces</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 17px;" id="HM_Item2_2">Embedded Linux, Setting up the Development Environment</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 50px;" id="HM_Item2_3">Embedded Linux, Understanding the Build Tools</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 83px;" id="HM_Item2_4">Embedded Linux, Building gcc-2.95.3 m68k-elf for uClinux</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 116px;" id="HM_Item2_5">Embedded Linux, BFLT Binary Flat Format</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 133px;" id="HM_Item2_6">Exploring the Netcomm NB5</div><div style="position: absolute; visibility: inherit; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; width: 293px; left: 0px; top: 150px;" id="HM_Item2_7"><img style="position: relative; margin-top: 2px; margin-right: -5px; float: right;" src="serial_files/HM_More_white_right.gif" hspace="0" vspace="0" width="5">Links</div></div><div style="position: absolute; visibility: hidden; left: -500px; top: 0px; width: 298px; border-width: 1px; border-color: rgb(93, 108, 168); border-style: solid; overflow: hidden; cursor: default; height: 268px;" id="HM_Menu3"><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 0px;" id="HM_Item3_1">Standard Parallel Port (SPP)</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 17px;" id="HM_Item3_2">Enhanced Parallel Port (EPP)</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 34px;" id="HM_Item3_3">Extended Capabilities Parallel Port (ECP)</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 51px;" id="HM_Item3_4">Parallel Port Debug Tool</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 68px;" id="HM_Item3_5">Parallel Port LCD Interface Example</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 85px;" id="HM_Item3_6">RS-232 Hardware &amp; Software Registers</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 102px;" id="HM_Item3_7">RS-232 Low Level Programming &amp; External Hardware</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 135px;" id="HM_Item3_8">Using Interrupts (PC)</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 152px;" id="HM_Item3_9">Interfacing Example - Analog Sampling Via the RS-232 Port</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 185px;" id="HM_Item3_10">Interfacing Example - Connecting a LCD Module to the RS-232 Port</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 218px;" id="HM_Item3_11">Quick and Simple RS-232 Terminal</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 235px;" id="HM_Item3_12">RS-232 Protocol Analyser</div><div style="position: absolute; visibility: inherit; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; width: 293px; left: 0px; top: 252px;" id="HM_Item3_13"><img style="position: relative; margin-top: 2px; margin-right: -5px; float: right;" src="serial_files/HM_More_white_right.gif" hspace="0" vspace="0" width="5">Links</div></div><div style="position: absolute; visibility: hidden; left: -500px; top: 0px; width: 298px; border-width: 1px; border-color: rgb(93, 108, 168); border-style: solid; overflow: hidden; cursor: default; height: 183px;" id="HM_Menu4"><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 0px;" id="HM_Item4_1">PortTalk - A Windows NT I/O Port Device Driver</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 33px;" id="HM_Item4_2">Universal Serial Bus Device Driver Development </div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 66px;" id="HM_Item4_3">Interrupts and Deferred Procedure Calls on Windows NT4/2000/XP </div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 99px;" id="HM_Item4_4">USB Driver for the Cypress USB Starter Kit</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 116px;" id="HM_Item4_5">Device Driver Fiddler (tools)</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 133px;" id="HM_Item4_6">Windows NT Device Driver Installer (tools)</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 150px;" id="HM_Item4_7">Device Driver Remover Win9x (tools)</div><div style="position: absolute; visibility: inherit; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; width: 293px; left: 0px; top: 167px;" id="HM_Item4_8"><img style="position: relative; margin-top: 2px; margin-right: -5px; float: right;" src="serial_files/HM_More_white_right.gif" hspace="0" vspace="0" width="5">Links</div></div><div style="position: absolute; visibility: hidden; left: -500px; top: 0px; width: 298px; border-width: 1px; border-color: rgb(93, 108, 168); border-style: solid; overflow: hidden; cursor: default; height: 383px;" id="HM_Menu5"><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 0px;" id="HM_Item5_1">CMOS Digital Image Sensors and Lenses</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 17px;" id="HM_Item5_2">Generate Ring Tones on your PIC16F87x Microcontroller</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 50px;" id="HM_Item5_3">Interfacing the AT Keyboard</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 67px;" id="HM_Item5_4">How does the Microchip ICD Work?</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 84px;" id="HM_Item5_5">Trust-No-Exe</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 101px;" id="HM_Item5_6">Command Line Process Viewer/Killer/Suspender for Windows NT/2000/XP</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 134px;" id="HM_Item5_7">BeyondExec - Spawn Processes on Remote Windows NT/2000/XP WorkStations</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 167px;" id="HM_Item5_8">Beyond Logic Shutdown Utility for NT/2000/XP</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 184px;" id="HM_Item5_9">Bmail - Command Line SMTP Mailer for Batch Jobs</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 217px;" id="HM_Item5_10">Delete/Copy by Owner utility for Windows NT/2000/XP</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 250px;" id="HM_Item5_11">Win32 Pipe Security Editor Windows NT/2000/XP</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 283px;" id="HM_Item5_12">Console Computer Information Utility for 2000/XP</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 316px;" id="HM_Item5_13">SMART &amp; Simple for NT/2000/XP</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 333px;" id="HM_Item5_14">Kodak DC215 Support and FAQ</div><div style="position: absolute; visibility: inherit; cursor: pointer; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; border-bottom: 1px solid rgb(93, 108, 168); width: 293px; left: 0px; top: 350px;" id="HM_Item5_15">South Australian Electricity Generation</div><div style="position: absolute; visibility: inherit; background-color: BLUE; color: white; padding: 0px 5px 0px 0px; font: bold 10pt Verdana,Arial,sans-serif; width: 293px; left: 0px; top: 367px;" id="HM_Item5_16"><img style="position: relative; margin-top: 2px; margin-right: -5px; float: right;" src="serial_files/HM_More_white_right.gif" hspace="0" vspace="0" width="5">Links</div></div></body></html>

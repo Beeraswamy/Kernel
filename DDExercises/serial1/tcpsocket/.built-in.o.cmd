@@ -1,0 +1,1 @@
+cmd_/home/sureshv1/kernels/modules/cmc/new-demo-examples/tcpsocket/built-in.o :=  rm -f /home/sureshv1/kernels/modules/cmc/new-demo-examples/tcpsocket/built-in.o; ar rcs /home/sureshv1/kernels/modules/cmc/new-demo-examples/tcpsocket/built-in.o

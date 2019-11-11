@@ -1,0 +1,11 @@
+obj-m += simpserial.o
+
+all:
+	make -C /tftpboot/linux-2.6.12 M=`pwd`
+	gcc -o devread devread.c
+	gcc -o devwrite devwrite.c
+	gcc -o devtest devtest.c
+
+clean:
+	rm -f *.o *.ko *.mod.c
+	rm -f devread devwrite devtest

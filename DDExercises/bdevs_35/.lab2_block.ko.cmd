@@ -1,0 +1,1 @@
+cmd_/home/viven/Desktop/DDExercises/bdevs_35/lab2_block.ko := ld -r -m elf_i386 -T /usr/src/linux-headers-2.6.38-8-generic/scripts/module-common.lds --build-id  -o /home/viven/Desktop/DDExercises/bdevs_35/lab2_block.ko /home/viven/Desktop/DDExercises/bdevs_35/lab2_block.o /home/viven/Desktop/DDExercises/bdevs_35/lab2_block.mod.o

@@ -1,0 +1,1 @@
+cmd_/home/viven/Desktop/viven/DDExercises/day1/2-exp_symbols/stackmod.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/viven/Desktop/viven/DDExercises/day1/2-exp_symbols/stackmod.ko /home/viven/Desktop/viven/DDExercises/day1/2-exp_symbols/stackmod.o /home/viven/Desktop/viven/DDExercises/day1/2-exp_symbols/stackmod.mod.o
